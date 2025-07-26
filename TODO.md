@@ -18,12 +18,12 @@ This document tracks implementation tasks, features, and enhancements.
 ## 💬 Gen AI Integration
 
 - [ ] Load TinyLlama or WebLLM model in browser
-- [ ] Generate error explanations for:
+- [x] Generate error explanations for:
   - Vague “Steps to Reproduce”
   - Invalid or missing version number
   - Unclassified feedback type
 - [x] Disable LLM if memory is below threshold
-- [ ] Create reusable prompt templates
+- [x] Create reusable prompt templates
 
 ## 🧩 Agent System
 
@@ -37,7 +37,7 @@ This document tracks implementation tasks, features, and enhancements.
 
 - [x] Add test mode with mock predictions
 - [x] Memory limit simulation mode
-- [ ] Verify fallback to static rules on low-end devices
+- [x] Verify fallback to static rules on low-end devices
 
 ## 📦 Deployment
 
