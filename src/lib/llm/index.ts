@@ -4,6 +4,10 @@ import {
   versionPrompt,
 } from './prompts'
 
+function stripThinkTags(text: string) {
+  return text.replace(/<think>.*?<\/think>/gs, '').trim()
+}
+
 const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
 const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
@@ -15,7 +19,7 @@ export async function loadLLM() {
   if (useWebLLM) {
     try {
       const { CreateMLCEngine } = await import('@mlc-ai/web-llm')
-      let engine = await CreateMLCEngine(modelId)
+      const engine = await CreateMLCEngine(modelId)
 
       console.log('[LLM] Active model:', modelId)
       console.log('[LLM] System prompt:', systemPrompt)
@@ -68,8 +72,8 @@ export async function loadLLM() {
               out,
             )
           }
-          
-          return out
+
+          return stripThinkTags(out)
         },
       }
     } catch (err) {
@@ -112,7 +116,7 @@ export async function loadLLM() {
           out,
         )
       }
-      return out
+      return stripThinkTags(out)
     },
   }
 }
