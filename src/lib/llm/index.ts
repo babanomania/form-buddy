@@ -53,7 +53,7 @@ export async function loadLLM() {
               { role: 'system', content: systemPrompt },
               { role: 'user', content: prompt },
             ],
-            max_tokens: 150,
+            // max_tokens: 150,
             temperature: 0.7,
           })
 
