@@ -8,7 +8,9 @@ FormBuddy is a demo bug reporting form that showcases in-browser machine learnin
 - **Predictive Validation** using a lightweight TensorFlow.js model
 - **Field Explanation** powered by a mocked WebLLM client with reusable prompt templates
 - **Memory Aware** – the LLM features are automatically disabled on devices with low memory (use `VITE_LOW_MEMORY=true` in development to simulate) and fall back to static hints
-- **WebLLM Support** – set `VITE_USE_WEBLLM=true` to load a TinyLlama model via WebLLM
+- **WebLLM Support** – set `VITE_USE_WEBLLM=true` to enable WebLLM. The model can
+  be changed with `VITE_WEBLLM_MODEL_ID` if you want to load a different
+  prebuilt model. By default it uses a TinyLlama variant.
 - **Debug Logging** – set `VITE_LOG_MODEL_IO=true` to print ML and LLM inputs and outputs to the console
 
 ## Bug Report Form Fields
