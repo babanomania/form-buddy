@@ -1,4 +1,14 @@
 export async function loadModel() {
+  // Use a predictable mock when running in test mode
+  if (import.meta.env.VITE_TEST_MODE === 'true') {
+    return {
+      predict: (value: string) => {
+        void value
+        return 0.9
+      },
+    }
+  }
+
   // Placeholder: In a real app, you would load a TF.js model from /public/models
   await new Promise((resolve) => setTimeout(resolve, 100))
   return {
