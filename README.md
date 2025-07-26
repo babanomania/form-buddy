@@ -14,35 +14,19 @@ Powered by a hybrid of in-browser machine learning and generative AI, FormBuddy 
 
 ## Why FormBuddy?
 
-Form validation is no longer just about red borders and `"This field is required."`
+Because forms deserve better than boring red borders and vague error messages.
 
-**FormBuddy goes further:**
-- Predicts likely mistakes before validation
-- Uses a lightweight ML model trained on real-world errors
-- Integrates a small language model (LLM) to clarify and rephrase inputs
-- Built directly on `react-hook-form`, so it’s composable and idiomatic for React
+FormBuddy enhances [React Hook Form](https://react-hook-form.com/) by adding:
 
+* **Predictive Validation** — A lightweight ML model (via TensorFlow\.js or ONNX.js) flags missing or invalid fields *before* traditional validation kicks in.
+* **Field-Level Explanations** — A small LLM (like TinyLlama or Qwen3-1.7B) offers concise, human-like feedback using WebLLM, Transformers.js, or even GGUF+WASM backends.
+* **Memory Awareness** — When memory is tight, FormBuddy gracefully disables LLM features and falls back to static hints (`VITE_LOW_MEMORY=true`).
+* **Composable Design** — Built directly on React Hook Form, FormBuddy works as a hook (`useFormBuddy`) and can be integrated without changing your existing form code.
+* **Customizable Prompts** — You control how prompts are constructed using field-specific templates.
+* **Zero Network Calls** — All inference happens inside the browser. No servers, no tokens, no privacy leaks.
+* **Debug Logging** — Enable `VITE_LOG_MODEL_IO=true` to log what your ML and LLM models are thinking.
 
-## In-Browser Inference: ML + Gen AI
-
-Modern browsers are surprisingly powerful. FormBuddy proves it by running both:
-
-| Model Type | Technology | Purpose |
-|------------|------------|---------|
-| ML Classifier | TensorFlow.js or ONNX.js | Predicts missing or error-prone fields |
-| LLM (TinyLlama, Qwen3-1.7B, etc.) | WebLLM / Transformers.js / WASM+GGUF | Expands vague text, offers natural language guidance |
-
-
-## Features
-
-- **React Hook Form** for standard form management and validation
-- **Predictive Validation** using a lightweight TensorFlow.js model
-- **Field Explanation** powered by a mocked WebLLM client with reusable prompt templates
-- **Memory Aware** – the LLM features are automatically disabled on devices with low memory (use `VITE_LOW_MEMORY=true` in development to simulate) and fall back to static hints
-- **WebLLM Support** – set `VITE_USE_WEBLLM=true` to enable WebLLM. The model can
-  be changed with `VITE_WEBLLM_MODEL_ID` if you want to load a different
-  prebuilt model. By default it uses a TinyLlama variant.
-- **Debug Logging** – set `VITE_LOG_MODEL_IO=true` to print ML and LLM inputs and outputs to the console
+FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome with an ML sidekick.
 
 ## Using FormBuddy
 
