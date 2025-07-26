@@ -2,7 +2,8 @@
 
 **FormBuddy** is an intelligent layer on top of [React Hook Form](https://react-hook-form.com/) that makes form filling smarter, friendlier, and more error-resistant — all on the client-side.
 
-Powered by a hybrid of in-browser machine learning and generative AI, FormBuddy actively:
+Powered by a hybrid of in-browser machine learning and generative AI, 
+FormBuddy actively:
 - Predicts common user errors
 - Explains vague or incomplete inputs
 - Guides users to submit clear, actionable data
