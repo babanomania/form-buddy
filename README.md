@@ -7,8 +7,6 @@ Powered by a hybrid of in-browser machine learning and generative AI, FormBuddy 
 - Explains vague or incomplete inputs
 - Guides users to submit clear, actionable data
 
----
-
 ## Why FormBuddy?
 
 Form validation is no longer just about red borders and `"This field is required."`
@@ -18,8 +16,6 @@ Form validation is no longer just about red borders and `"This field is required
 - Uses a lightweight ML model trained on real-world errors
 - Integrates a small language model (LLM) to clarify and rephrase inputs
 - Built directly on `react-hook-form`, so it’s composable and idiomatic for React
-
----
 
 ## In-Browser Inference: ML + Gen AI
 
@@ -46,8 +42,6 @@ if (navigator.deviceMemory >= 4 && performance.memory?.jsHeapSizeLimit > 1.5e9) 
 
 This means FormBuddy scales down gracefully on weaker hardware while still offering core predictive validation.
 
----
-
 ## Example Use Case: Bug Reporting Assistant
 
 Bug reports are often vague and frustrating:
@@ -72,8 +66,6 @@ The user is guided, not blocked.
 | `Feedback Type`      | ML predicts misclassifications (e.g., bug vs UI issue) |
 | `Screenshot`         | Model suggests uploading if it's commonly missing      |
 
----
-
 ## Architecture
 
 ```
@@ -91,8 +83,6 @@ Dynamic Hints + Auto-suggestions
 * No API keys, no latency, no server cost
 * Private by design — form data never leaves the device
 
----
-
 ## Tech Stack
 
 | Layer        | Tool                                  |
@@ -102,8 +92,6 @@ Dynamic Hints + Auto-suggestions
 | Gen AI       | WebLLM, Transformers.js, or WASM LLMs |
 | Forms        | Example: Bug Report Form              |
 | Deployment   | Vite / Next.js SPA / Static Host      |
-
----
 
 ## Getting Started
 
@@ -115,8 +103,6 @@ npm run dev
 ```
 
 Then open `http://localhost:5173` and try the Bug Reporting Assistant.
-
----
 
 ## Want to Extend It?
 
@@ -130,12 +116,8 @@ const { register, handleSubmit, watch } = useFormBuddy({
 });
 ```
 
----
-
 ## License
 
 MIT License. Feel free to fork and adapt!
-
----
 
 > Built with ❤️ to show just how far the modern browser has come — ML, LLMs, and empathy, all without leaving the tab.
