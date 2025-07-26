@@ -17,7 +17,7 @@ This document tracks implementation tasks, features, and enhancements.
 
 ## 💬 Gen AI Integration
 
-- [ ] Load TinyLlama or WebLLM model in browser
+ - [x] Load TinyLlama or WebLLM model in browser
 - [x] Generate error explanations for:
   - Vague “Steps to Reproduce”
   - Invalid or missing version number
@@ -41,9 +41,9 @@ This document tracks implementation tasks, features, and enhancements.
 
 ## 📦 Deployment
 
-- [ ] Vite + static hosting
-- [ ] Offline-first build via service workers (optional)
-- [ ] Sample bug reports for demo
+ - [x] Vite + static hosting
+ - [x] Offline-first build via service workers (optional)
+ - [x] Sample bug reports for demo
 
 ## 📚 Documentation
 
