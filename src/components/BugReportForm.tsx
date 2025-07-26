@@ -3,6 +3,7 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { useFormBuddy, type FieldDetail } from '../hooks/useFormBuddy'
+import { defaultSystemPrompts } from '../lib/llm/systemPrompts'
 
 interface FormValues {
   fullName: string
@@ -46,7 +47,11 @@ const schema: yup.ObjectSchema<FormValues> = yup.object({
 
 function InnerForm() {
   const { register, handleSubmit, trigger, formState: { errors } } = useFormContext<FormValues>()
-  const { handleBlur, loading, checking } = useFormBuddy<FormValues>(FORM_DESCRIPTION, FIELDS)
+  const { handleBlur, loading, checking } = useFormBuddy<FormValues>(
+    FORM_DESCRIPTION,
+    FIELDS,
+    defaultSystemPrompts,
+  )
 
   const fullNameField = register('fullName')
   const emailField = register('email')
