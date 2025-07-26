@@ -31,6 +31,7 @@ export function BugReportForm() {
   const predict = usePredictiveValidation(true)
   const explain = useFieldExplainer(true)
   const [hints, setHints] = useState<Record<string, string>>({})
+  const [checking, setChecking] = useState<Record<string, boolean>>({})
 
   const watcher = useRef(createInputWatcherAgent())
   const validator = useRef(createPredictiveValidatorAgent(predict))
@@ -54,6 +55,7 @@ export function BugReportForm() {
 
   useEffect(() => {
     const handle = async (field: string, value: string) => {
+      setChecking((c) => ({ ...c, [field]: true }))
       const result = await validator.current.check(field, value)
       if (result) {
         let message = 'This field may be incomplete.'
@@ -68,6 +70,7 @@ export function BugReportForm() {
       } else {
         setHints((h) => ({ ...h, [field]: '' }))
       }
+      setChecking((c) => ({ ...c, [field]: false }))
     }
     watcher.current.register(handle)
   }, [])
@@ -129,7 +132,11 @@ export function BugReportForm() {
           }}
         />
         {errors.fullName && <span>Required</span>}
-        {hints.fullName && <small>{hints.fullName}</small>}
+        {checking.fullName ? (
+          <small>Checking...</small>
+        ) : (
+          hints.fullName && <small>{hints.fullName}</small>
+        )}
       </div>
 
       <div>
@@ -143,7 +150,11 @@ export function BugReportForm() {
           }}
         />
         {errors.email && <span>Required</span>}
-        {hints.email && <small>{hints.email}</small>}
+        {checking.email ? (
+          <small>Checking...</small>
+        ) : (
+          hints.email && <small>{hints.email}</small>
+        )}
       </div>
 
       <div>
@@ -160,7 +171,11 @@ export function BugReportForm() {
           <option value="UI Issue">UI Issue</option>
         </select>
         {errors.feedbackType && <span>Required</span>}
-        {hints.feedbackType && <small>{hints.feedbackType}</small>}
+        {checking.feedbackType ? (
+          <small>Checking...</small>
+        ) : (
+          hints.feedbackType && <small>{hints.feedbackType}</small>
+        )}
       </div>
 
       <div>
@@ -173,7 +188,11 @@ export function BugReportForm() {
           }}
         />
         {errors.version && <span>Required</span>}
-        {hints.version && <small>{hints.version}</small>}
+        {checking.version ? (
+          <small>Checking...</small>
+        ) : (
+          hints.version && <small>{hints.version}</small>
+        )}
       </div>
 
       <div>
@@ -186,7 +205,11 @@ export function BugReportForm() {
           }}
         />
         {errors.steps && <span>Required</span>}
-        {hints.steps && <small>{hints.steps}</small>}
+        {checking.steps ? (
+          <small>Checking...</small>
+        ) : (
+          hints.steps && <small>{hints.steps}</small>
+        )}
       </div>
 
       <div>
@@ -199,7 +222,11 @@ export function BugReportForm() {
           }}
         />
         {errors.expected && <span>Required</span>}
-        {hints.expected && <small>{hints.expected}</small>}
+        {checking.expected ? (
+          <small>Checking...</small>
+        ) : (
+          hints.expected && <small>{hints.expected}</small>
+        )}
       </div>
 
       <div>
@@ -212,7 +239,11 @@ export function BugReportForm() {
           }}
         />
         {errors.actual && <span>Required</span>}
-        {hints.actual && <small>{hints.actual}</small>}
+        {checking.actual ? (
+          <small>Checking...</small>
+        ) : (
+          hints.actual && <small>{hints.actual}</small>
+        )}
       </div>
 
       <div>
