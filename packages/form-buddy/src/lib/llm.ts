@@ -55,7 +55,27 @@ export async function loadLLM(id: string = envModelId) {
       systemPrompt: string = defaultSystemPrompt,
     ) => {
       void systemPrompt
-      const out = `Improve: "${prompt}"`
+      // Simple heuristic fallback when WebLLM is disabled
+      const reasonMatch = prompt.match(/Reason:\s*(.+)/)
+      const fieldMatch = prompt.match(/Field:\s*(.+)/)
+      const reason = reasonMatch ? reasonMatch[1].toLowerCase() : ''
+      const field = fieldMatch ? fieldMatch[1].toLowerCase() : 'field'
+
+      let out: string
+      switch (reason) {
+        case 'missing':
+          out = `Please fill in the ${field}.`
+          break
+        case 'too short':
+          out = `Provide a more detailed ${field}.`
+          break
+        case 'invalid':
+          out = `The ${field} seems invalid. Please correct it.`
+          break
+        default:
+          out = `Consider improving the ${field}.`
+      }
+
       if (logIO) {
         console.log('[LLM] input:', prompt, 'output:', out)
       }
