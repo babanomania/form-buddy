@@ -105,16 +105,29 @@ the model can predict issues for individual inputs. The resulting file
 is placed in `packages/example/public/models` and can be loaded by the predictive
 validation hook.
 
-Install the Python requirements first:
+1. Install the change to training directory:
+
+```bash
+cd training
+```
+
+2. Create a virtual environment
+
+```bash
+python -m venv venv
+. venv/bin/activate
+```
+
+3. Next Install the Python requirements:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Then run the training script:
+4. Then run the training script:
 
 ```bash
-python training/train_model.py
+python train_model.py
 ```
 
 ## Testing

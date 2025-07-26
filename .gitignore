@@ -1,6 +1,3 @@
 node_modules/
-dist/
 .env
-venv/
-__pycache__/
 packages/example/public/models/*.onnx
