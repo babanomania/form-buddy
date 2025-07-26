@@ -1,7 +1,9 @@
-export type Validator = (value: string) => Promise<number | null>
+import type { Prediction } from '../lib/ml/model'
+
+export type Validator = (value: string) => Promise<Prediction | null>
 
 export interface PredictiveValidatorAgent {
-  check(field: string, value: string): Promise<number | null>
+  check(field: string, value: string): Promise<Prediction | null>
 }
 
 export function createPredictiveValidatorAgent(validate: Validator): PredictiveValidatorAgent {

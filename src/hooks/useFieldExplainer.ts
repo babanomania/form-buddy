@@ -18,6 +18,7 @@ function hasEnoughMemory() {
 export function useFieldExplainer(enabled = true) {
   const [llm, setLLM] = useState<LLM | null>(null)
   const loading = useRef(false)
+  const cache = useRef(new Map<string, string>())
 
   useEffect(() => {
     if (enabled && hasEnoughMemory() && !llm && !loading.current) {
@@ -39,12 +40,22 @@ export function useFieldExplainer(enabled = true) {
     return null
   }
 
-  return async (field: string, value: string) => {
+  return async (
+    field: string,
+    value: string,
+    errorType: string | null,
+  ): Promise<string | null> => {
+    const key = `${field}|${value}|${errorType ?? ''}`
+    const cached = cache.current.get(key)
+    if (cached) return cached
+    let res: string | null
     if (llm && hasEnoughMemory()) {
-      const res = await llm.explain(field, value)
-      return res
+      res = await llm.explain(field, value, errorType)
+    } else {
+      res = fallbackExplain(field, value)
     }
-    return fallbackExplain(field, value)
+    if (res) cache.current.set(key, res)
+    return res
   }
 }
 

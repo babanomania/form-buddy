@@ -33,20 +33,26 @@ export async function loadLLM() {
       console.log('[LLM] System prompt:', systemPrompt)
 
       return {
-        explain: async (field: string, text: string) => {
+        explain: async (
+          field: string,
+          text: string,
+          errorType: string | null,
+        ) => {
           let prompt: string
           switch (field) {
             case 'steps':
-              prompt = stepsPrompt(text)
+              prompt = stepsPrompt(text, errorType ?? undefined)
               break
             case 'version':
-              prompt = versionPrompt(text)
+              prompt = versionPrompt(text, errorType ?? undefined)
               break
             case 'feedbackType':
-              prompt = feedbackTypePrompt(text)
+              prompt = feedbackTypePrompt(text, errorType ?? undefined)
               break
             default:
-              prompt = `Provide feedback about: "${text}"`
+              prompt = `Provide feedback about: "${text}"${
+                errorType ? ` The ML model flagged this as ${errorType}.` : ''
+              }`
           }
           
           console.log('[LLM] Generating explanation for field:', field, 'with prompt:', prompt)
@@ -63,7 +69,16 @@ export async function loadLLM() {
             reply.choices?.[0]?.message?.content ?? 'Could not generate suggestion.'
 
           if (logIO) {
-            console.log('[LLM] field:', field, 'input:', text, 'output:', out)
+            console.log(
+              '[LLM] field:',
+              field,
+              'input:',
+              text,
+              'type:',
+              errorType,
+              'output:',
+              out,
+            )
           }
           
           return out
@@ -76,23 +91,38 @@ export async function loadLLM() {
 
   await new Promise((resolve) => setTimeout(resolve, 100))
   return {
-    explain: async (field: string, text: string) => {
+    explain: async (
+      field: string,
+      text: string,
+      errorType: string | null,
+    ) => {
       let out: string
       switch (field) {
         case 'steps':
-          out = stepsPrompt(text)
+          out = stepsPrompt(text, errorType ?? undefined)
           break
         case 'version':
-          out = versionPrompt(text)
+          out = versionPrompt(text, errorType ?? undefined)
           break
         case 'feedbackType':
-          out = feedbackTypePrompt(text)
+          out = feedbackTypePrompt(text, errorType ?? undefined)
           break
         default:
-          out = `Improve: "${text}"`
+          out = `Improve: "${text}"${
+            errorType ? ` The ML model flagged this as ${errorType}.` : ''
+          }`
       }
       if (logIO) {
-        console.log('[LLM] field:', field, 'input:', text, 'output:', out)
+        console.log(
+          '[LLM] field:',
+          field,
+          'input:',
+          text,
+          'type:',
+          errorType,
+          'output:',
+          out,
+        )
       }
       return out
     },
