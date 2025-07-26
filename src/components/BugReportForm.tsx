@@ -36,6 +36,10 @@ export function BugReportForm() {
   const validator = useRef(createPredictiveValidatorAgent(predict))
   const explainer = useRef(createFieldExplainerAgent(explain))
   const memory = useRef(createMemoryManagerAgent())
+
+  useEffect(() => {
+    explainer.current.setExplainer(explain)
+  }, [explain])
   const advisor = useRef(
     createSubmissionAdvisorAgent([
       'fullName',
