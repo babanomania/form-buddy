@@ -2,18 +2,27 @@ export type InputCallback = (field: string, value: string) => void
 
 export interface InputWatcherAgent {
   register(cb: InputCallback): void
-  watch(element: HTMLElement, field: string): () => void
+  watch(element: EventTarget | null, field: string): () => void
+}
+
+function isEventTarget(el: unknown): el is EventTarget {
+  return !!el && typeof (el as EventTarget).addEventListener === 'function'
 }
 
 export function createInputWatcherAgent(delay = 300): InputWatcherAgent {
   const callbacks: InputCallback[] = []
-  const timers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>()
+  const timers = new WeakMap<EventTarget, ReturnType<typeof setTimeout>>()
 
   return {
     register(cb) {
       callbacks.push(cb)
     },
     watch(element, field) {
+      if (!isEventTarget(element)) {
+        console.warn('InputWatcherAgent.watch: invalid element', element)
+        return () => {}
+      }
+
       const run = (value: string) => {
         callbacks.forEach((cb) => cb(field, value))
       }
