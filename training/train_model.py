@@ -9,7 +9,7 @@ import onnx
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 
-DATA_PATH = Path('data/synthetic_bug_reports.json')
+DATA_PATH = Path('training/bug_reports_data.json')
 MODEL_PATH = Path('packages/example/public/models/bug_report_classifier.onnx')
 
 

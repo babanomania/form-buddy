@@ -154,7 +154,7 @@ def main() -> None:
     random.shuffle(labels)
     reports = [generate_entry(label) for label in labels]
 
-    output_path = Path("data/synthetic_bug_reports.json")
+    output_path = Path("training/bug_reports_data.json")
     output_path.write_text(json.dumps(reports, indent=2))
     print(f"Wrote {len(reports)} reports to {output_path}")
     print("Sample:", reports[:5])
