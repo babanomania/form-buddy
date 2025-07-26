@@ -1,4 +1,4 @@
-import type { Prediction } from '../lib/ml/model'
+import type { Prediction } from '../lib/classifier'
 
 export type Validator = (value: string) => Promise<Prediction | null>
 

@@ -44,7 +44,7 @@ The repository includes a small Python script that trains a text
 classifier on the synthetic bug report dataset and exports it to ONNX
 format. Each row of the dataset now contains per-field error labels so
 the model can predict issues for individual inputs. The resulting file
-is placed in `public/models` and can be loaded by the predictive
+is placed in `packages/example/public/models` and can be loaded by the predictive
 validation hook.
 
 Install the Python requirements first:
@@ -66,8 +66,8 @@ This repo now uses **npm workspaces**.
 - `packages/form-buddy` – reusable hooks and agents
 - `packages/example` – demo application
 - `packages/form-buddy/src/hooks/useFormBuddy.ts` – main helper hook
-- `packages/form-buddy/src/lib/ml/model.ts` – placeholder ML implementation
-- `packages/form-buddy/src/lib/llm/index.ts` – mock LLM client
+- `packages/form-buddy/src/lib/classifier.ts` – placeholder ML implementation
+- `packages/form-buddy/src/lib/llm.ts` – mock LLM client
 - `packages/example/src/components/BugReportForm.tsx` – example form component
 - `packages/example/public/models` – place to store local model files
 
