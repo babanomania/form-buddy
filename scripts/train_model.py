@@ -13,16 +13,29 @@ DATA_PATH = Path('data/synthetic_bug_reports.json')
 MODEL_PATH = Path('public/models/bug_report_classifier.onnx')
 
 
+FIELDS = [
+    "fullName",
+    "email",
+    "feedbackType",
+    "appVersion",
+    "stepsToReproduce",
+    "expectedBehavior",
+    "actualBehavior",
+]
+
+
 def load_data():
     with DATA_PATH.open() as f:
         data = json.load(f)
     texts = []
     labels = []
     for entry in data:
-        text = f"{entry['feedbackType']} {'yes' if entry['screenshotProvided'] else 'no'} " \
-               f"{entry['stepsToReproduce']} {entry['expectedBehavior']} {entry['actualBehavior']}"
-        texts.append(text)
-        labels.append(entry['label'])
+        errors = entry.get("errors", {})
+        for field in FIELDS:
+            value = entry.get(field, "")
+            label = errors.get(field, "ok")
+            texts.append(f"{field}: {value}")
+            labels.append(label)
     return texts, labels
 
 

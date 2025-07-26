@@ -15,7 +15,7 @@ function hasEnoughMemory() {
   return deviceMemory >= 4 && heapLimit >= 1.5e9
 }
 
-export function useFieldExplainer(enabled = true) {
+export function useFieldExplainer(enabled = true, modelName?: string) {
   const [llm, setLLM] = useState<LLM | null>(null)
   const loading = useRef(false)
   const cache = useRef(new Map<string, string>())
@@ -23,12 +23,12 @@ export function useFieldExplainer(enabled = true) {
   useEffect(() => {
     if (enabled && hasEnoughMemory() && !llm && !loading.current) {
       loading.current = true
-      loadLLM().then((m) => setLLM(m))
+      loadLLM(modelName).then((m) => setLLM(m))
     } else if ((!enabled || !hasEnoughMemory()) && llm) {
       setLLM(null)
       loading.current = false
     }
-  }, [enabled, llm])
+  }, [enabled, llm, modelName])
 
   const fallbackExplain = (field: string, value: string) => {
     if (field === 'steps' && value.trim().length < 10)

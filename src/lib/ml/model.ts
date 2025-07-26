@@ -5,13 +5,13 @@ export interface Prediction {
   type: string
 }
 
-const modelName = 'bug_report_classifier.onnx'
+const defaultModelName = 'bug_report_classifier.onnx'
 
-export async function loadModel() {
+export async function loadModel(name: string = defaultModelName) {
   // Use a predictable mock when running in test mode
   if (import.meta.env.VITE_TEST_MODE === 'true') {
     return {
-      modelName,
+      modelName: name,
       predict: (value: string): Prediction => {
         void value
         const result = { score: 0.9, type: 'incomplete' } as Prediction
@@ -26,7 +26,7 @@ export async function loadModel() {
   // Placeholder: In a real app, you would load a TF.js model from /public/models
   await new Promise((resolve) => setTimeout(resolve, 100))
   return {
-    modelName,
+    modelName: name,
     predict: (input: string): Prediction => {
       const trimmed = input.trim()
       let score: number
