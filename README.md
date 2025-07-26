@@ -75,6 +75,9 @@ npm run build
 ```
 
 The optimized site is written to `dist/` and includes a service worker for offline usage. Preview it locally with `npm run preview` and deploy the `dist` folder to any static host.
+If your bundle is larger than 2 MiB, adjust the Workbox caching limit in
+`vite.config.ts` using `workbox.maximumFileSizeToCacheInBytes` so the service
+worker can precache all assets.
 
 ## Sample Bug Reports
 
