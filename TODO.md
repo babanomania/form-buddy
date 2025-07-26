@@ -12,7 +12,7 @@ This document tracks implementation tasks, features, and enhancements.
 ## 🧠 ML Model
 
  - [x] Create synthetic bug report dataset (complete vs incomplete)
-- [ ] Train TF.js / ONNX model for predictive validation
+ - [x] Train TF.js / ONNX model for predictive validation
 - [x] Add live prediction on field blur or debounce
 
 ## 💬 Gen AI Integration

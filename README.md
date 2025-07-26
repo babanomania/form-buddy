@@ -31,6 +31,25 @@ npm run dev
 
 Open `http://localhost:5173` to try it out.
 
+### Training the ML model
+
+The repository includes a small Python script that trains a text
+classifier on the synthetic bug report dataset and exports it to ONNX
+format.  The resulting file is placed in `public/models` and can be
+loaded by the predictive validation hook.
+
+Install the Python requirements first:
+
+```bash
+pip install -r requirements.txt
+```
+
+Then run the training script:
+
+```bash
+python scripts/train_model.py
+```
+
 ## Project Structure
 
 - `src/components/BugReportForm.tsx` – main form component
