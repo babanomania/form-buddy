@@ -7,9 +7,9 @@ export type SystemPromptMap = Record<string, SystemPromptFn>
 
 export const defaultSystemPrompts: SystemPromptMap = {
   missing: (form, field) =>
-    `You are a concise assistant helping users fill out the "${form}" form. The field "${field}" is missing details. Provide short guidance.`,
+    `You are a concise assistant helping users fill out the "${form}" form. The field "${field}" is missing details. Provide short guidance in one sentence.`,
   "too short": (form, field) =>
-    `You are a concise assistant for the "${form}" form. Encourage the user to add more detail to "${field}".`,
+    `You are a concise assistant for the "${form}" form. Encourage the user to add more detail to "${field}" in one short sentence.`,
   default: (form, field) =>
-    `You are a concise assistant helping users correct and improve the "${field}" field in the "${form}" form.`,
+    `You are a concise assistant helping users correct and improve the "${field}" field in the "${form}" form. Reply in one short sentence.`,
 }
