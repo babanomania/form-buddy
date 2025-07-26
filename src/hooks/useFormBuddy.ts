@@ -14,6 +14,7 @@ export function useFormBuddy<T extends FieldValues>(
 ) {
   const { setError } = useFormContext<T>()
   const [loading, setLoading] = useState(true)
+  const [checking, setChecking] = useState<Record<string, boolean>>({})
   const modelRef = useRef<Model | null>(null)
   const llmRef = useRef<LLM | null>(null)
   const cache = useRef(new Map<string, string>())
@@ -37,10 +38,12 @@ export function useFormBuddy<T extends FieldValues>(
 
   const handleBlur = async (name: Path<T>, value: string) => {
     if (!modelRef.current || !llmRef.current) return
+    setChecking((m) => ({ ...m, [name]: true }))
     const key = `${name}|${value}`
     const cached = cache.current.get(key)
     if (cached) {
       setError(name, { type: 'formbuddy', message: cached })
+      setChecking((m) => ({ ...m, [name]: false }))
       return
     }
     const prediction: Prediction = modelRef.current.predict(value)
@@ -57,7 +60,8 @@ export function useFormBuddy<T extends FieldValues>(
         setError(name, { type: 'formbuddy', message })
       }
     }
+    setChecking((m) => ({ ...m, [name]: false }))
   }
 
-  return { handleBlur, loading }
+  return { handleBlur, loading, checking }
 }

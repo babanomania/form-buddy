@@ -1,5 +1,7 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from '@mui/material'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 import { useFormBuddy, type FieldDetail } from '../hooks/useFormBuddy'
 
 interface FormValues {
@@ -10,7 +12,7 @@ interface FormValues {
   steps: string
   expected: string
   actual: string
-  screenshot?: FileList
+  screenshot?: FileList | null
 }
 
 const FORM_DESCRIPTION = 'Bug report submission form for the FormBuddy demo application.'
@@ -25,9 +27,35 @@ const FIELDS: FieldDetail[] = [
   { name: 'actual', description: 'Actual behaviour observed' },
 ]
 
+const schema: yup.ObjectSchema<FormValues> = yup.object({
+  fullName: yup.string().required('Required'),
+  email: yup.string().email('Invalid email').required('Required'),
+  feedbackType: yup
+    .string()
+    .oneOf(['Bug', 'Feature', 'UI Issue'], 'Invalid type')
+    .required('Required'),
+  version: yup
+    .string()
+    .matches(/\d+\.\d+\.\d+/, 'Invalid version')
+    .required('Required'),
+  steps: yup.string().min(10, 'Too short').required('Required'),
+  expected: yup.string().required('Required'),
+  actual: yup.string().required('Required'),
+  screenshot: yup.mixed<FileList>().nullable(),
+})
+
 function InnerForm() {
-  const { register, handleSubmit, formState: { errors } } = useFormContext<FormValues>()
-  const { handleBlur, loading } = useFormBuddy<FormValues>(FORM_DESCRIPTION, FIELDS)
+  const { register, handleSubmit, trigger, formState: { errors } } = useFormContext<FormValues>()
+  const { handleBlur, loading, checking } = useFormBuddy<FormValues>(FORM_DESCRIPTION, FIELDS)
+
+  const fullNameField = register('fullName')
+  const emailField = register('email')
+  const feedbackTypeField = register('feedbackType')
+  const versionField = register('version')
+  const stepsField = register('steps')
+  const expectedField = register('expected')
+  const actualField = register('actual')
+  const screenshotField = register('screenshot')
 
   const onSubmit = (data: FormValues) => {
     alert(JSON.stringify(data, null, 2))
@@ -39,19 +67,27 @@ function InnerForm() {
       <Stack spacing={2}>
         <TextField
           label="Full Name"
-          {...register('fullName', { required: 'Required' })}
-          onBlur={(e) => handleBlur('fullName', e.target.value)}
+          {...fullNameField}
+          onBlur={async (e) => {
+            fullNameField.onBlur(e)
+            const valid = await trigger('fullName')
+            if (valid) await handleBlur('fullName', e.target.value)
+          }}
           error={!!errors.fullName}
-          helperText={errors.fullName?.message || ' '}
+          helperText={checking.fullName ? 'Checking...' : errors.fullName?.message || ' '}
         />
 
         <TextField
           label="Email"
           type="email"
-          {...register('email', { required: 'Required' })}
-          onBlur={(e) => handleBlur('email', e.target.value)}
+          {...emailField}
+          onBlur={async (e) => {
+            emailField.onBlur(e)
+            const valid = await trigger('email')
+            if (valid) await handleBlur('email', e.target.value)
+          }}
           error={!!errors.email}
-          helperText={errors.email?.message || ' '}
+          helperText={checking.email ? 'Checking...' : errors.email?.message || ' '}
         />
 
         <FormControl fullWidth error={!!errors.feedbackType}>
@@ -60,57 +96,77 @@ function InnerForm() {
             labelId="feedback-type-label"
             label="Feedback Type"
             defaultValue="Bug"
-            {...register('feedbackType', { required: 'Required' })}
-            onBlur={(e) => handleBlur('feedbackType', (e.target as HTMLInputElement).value)}
+            {...feedbackTypeField}
+            onBlur={async (e) => {
+              feedbackTypeField.onBlur(e)
+              const valid = await trigger('feedbackType')
+              if (valid) await handleBlur('feedbackType', (e.target as HTMLInputElement).value)
+            }}
           >
             <MenuItem value="Bug">Bug</MenuItem>
             <MenuItem value="Feature">Feature</MenuItem>
             <MenuItem value="UI Issue">UI Issue</MenuItem>
           </Select>
-          <small>{errors.feedbackType?.message || ' '}</small>
+          <small>{checking.feedbackType ? 'Checking...' : errors.feedbackType?.message || ' '}</small>
         </FormControl>
 
         <TextField
           label="App Version"
-          {...register('version', { required: 'Required' })}
-          onBlur={(e) => handleBlur('version', e.target.value)}
+          {...versionField}
+          onBlur={async (e) => {
+            versionField.onBlur(e)
+            const valid = await trigger('version')
+            if (valid) await handleBlur('version', e.target.value)
+          }}
           error={!!errors.version}
-          helperText={errors.version?.message || ' '}
+          helperText={checking.version ? 'Checking...' : errors.version?.message || ' '}
         />
 
         <TextField
           label="Steps to Reproduce"
           multiline
           minRows={3}
-          {...register('steps', { required: 'Required' })}
-          onBlur={(e) => handleBlur('steps', e.target.value)}
+          {...stepsField}
+          onBlur={async (e) => {
+            stepsField.onBlur(e)
+            const valid = await trigger('steps')
+            if (valid) await handleBlur('steps', e.target.value)
+          }}
           error={!!errors.steps}
-          helperText={errors.steps?.message || ' '}
+          helperText={checking.steps ? 'Checking...' : errors.steps?.message || ' '}
         />
 
         <TextField
           label="Expected Behavior"
           multiline
           minRows={2}
-          {...register('expected', { required: 'Required' })}
-          onBlur={(e) => handleBlur('expected', e.target.value)}
+          {...expectedField}
+          onBlur={async (e) => {
+            expectedField.onBlur(e)
+            const valid = await trigger('expected')
+            if (valid) await handleBlur('expected', e.target.value)
+          }}
           error={!!errors.expected}
-          helperText={errors.expected?.message || ' '}
+          helperText={checking.expected ? 'Checking...' : errors.expected?.message || ' '}
         />
 
         <TextField
           label="Actual Behavior"
           multiline
           minRows={2}
-          {...register('actual', { required: 'Required' })}
-          onBlur={(e) => handleBlur('actual', e.target.value)}
+          {...actualField}
+          onBlur={async (e) => {
+            actualField.onBlur(e)
+            const valid = await trigger('actual')
+            if (valid) await handleBlur('actual', e.target.value)
+          }}
           error={!!errors.actual}
-          helperText={errors.actual?.message || ' '}
+          helperText={checking.actual ? 'Checking...' : errors.actual?.message || ' '}
         />
 
         <Button variant="outlined" component="label">
           Upload Screenshot
-          <input type="file" hidden {...register('screenshot')} />
+          <input type="file" hidden {...screenshotField} />
         </Button>
 
         <Button type="submit" variant="contained">
@@ -122,7 +178,10 @@ function InnerForm() {
 }
 
 export function BugReportForm() {
-  const methods = useForm<FormValues>()
+  const methods = useForm<FormValues>({
+    resolver: yupResolver(schema),
+    mode: 'onBlur',
+  })
 
   return (
     <FormProvider {...methods}>
