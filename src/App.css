@@ -5,30 +5,3 @@
   font-family: sans-serif;
 }
 
-form > div {
-  margin-bottom: 1rem;
-  text-align: left;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-}
-
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-}
-
-small {
-  color: #e53935;
-}
-
-button {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-}
