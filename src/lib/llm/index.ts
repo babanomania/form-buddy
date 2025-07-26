@@ -7,8 +7,7 @@ import {
 const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
 const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
-const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-0.5B-Chat-q4f32_0'
-const fallbackModelId = 'RedPajama-INCITE-Chat-3B-v1-q4f32_0'
+const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-1.7B-q4f32_1-MLC'
 const systemPrompt =
   'You are a concise assistant helping users correct and improve short form inputs for a bug report. Avoid long explanations. Reply in under two sentences using clear, direct language.'
 
@@ -16,20 +15,9 @@ export async function loadLLM() {
   if (useWebLLM) {
     try {
       const { CreateMLCEngine } = await import('@mlc-ai/web-llm')
-      let engine
-      let activeModel = modelId
-      try {
-        engine = await CreateMLCEngine(modelId)
-      } catch (err) {
-        console.warn(
-          `[LLM] Failed to load model ${modelId}, falling back to ${fallbackModelId}`,
-          err,
-        )
-        engine = await CreateMLCEngine(fallbackModelId)
-        activeModel = fallbackModelId
-      }
+      let engine = await CreateMLCEngine(modelId)
 
-      console.log('[LLM] Active model:', activeModel)
+      console.log('[LLM] Active model:', modelId)
       console.log('[LLM] System prompt:', systemPrompt)
 
       return {
