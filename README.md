@@ -19,7 +19,7 @@ Because forms deserve better than boring red borders and vague error messages.
 FormBuddy enhances [React Hook Form](https://react-hook-form.com/) by adding:
 
 * **Predictive Validation** — A lightweight ML model (via TensorFlow\.js or ONNX.js) flags missing or invalid fields *before* traditional validation kicks in.
-* **Field-Level Explanations** — A small LLM (like TinyLlama or Qwen3-1.7B) offers concise, human-like feedback using WebLLM, Transformers.js, or even GGUF+WASM backends.
+* **Field-Level Explanations** — A small LLM (like TinyLlama or Qwen3-1.7B) offers concise, human-like feedback using WebLLM.
 * **Memory Awareness** — When memory is tight, FormBuddy gracefully disables LLM features and falls back to static hints (`VITE_LOW_MEMORY=true`).
 * **Composable Design** — Built directly on React Hook Form, FormBuddy works as a hook (`useFormBuddy`) and can be integrated without changing your existing form code.
 * **Customizable Prompts** — You control how prompts are constructed using field-specific templates.
