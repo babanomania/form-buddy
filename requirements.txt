@@ -1,3 +1,4 @@
 scikit-learn
 onnx
 skl2onnx
+packaging
