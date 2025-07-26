@@ -36,7 +36,7 @@ This document tracks implementation tasks, features, and enhancements.
 ## 🧪 Testing
 
 - [x] Add test mode with mock predictions
-- [ ] Memory limit simulation mode
+- [x] Memory limit simulation mode
 - [ ] Verify fallback to static rules on low-end devices
 
 ## 📦 Deployment

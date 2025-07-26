@@ -4,7 +4,10 @@ import { loadLLM, type LLM } from '../lib/llm'
 interface NavigatorWithMemory extends Navigator { deviceMemory?: number }
 interface PerformanceWithMemory extends Performance { memory?: { jsHeapSizeLimit: number } }
 
+const simulateLowMemory = import.meta.env.VITE_LOW_MEMORY === 'true'
+
 function hasEnoughMemory() {
+  if (simulateLowMemory) return false
   const nav = navigator as NavigatorWithMemory
   const perf = performance as PerformanceWithMemory
   const deviceMemory = nav.deviceMemory || 4

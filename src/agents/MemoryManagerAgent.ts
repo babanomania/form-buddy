@@ -9,13 +9,14 @@ export interface MemoryManagerAgent {
 }
 
 export function createMemoryManagerAgent(thresholdMB = 4000): MemoryManagerAgent {
+  const simulateLowMemory = import.meta.env.VITE_LOW_MEMORY === 'true'
   const listeners: ((enabled: boolean) => void)[] = []
   let llmEnabled = true
 
   const checkMemory = () => {
     const nav = navigator as NavigatorWithMemory
     const deviceMemory = nav.deviceMemory || 4
-    const ok = deviceMemory * 1024 >= thresholdMB
+    const ok = !simulateLowMemory && deviceMemory * 1024 >= thresholdMB
     if (ok !== llmEnabled) {
       llmEnabled = ok
       listeners.forEach((l) => l(llmEnabled))
