@@ -11,7 +11,7 @@ This document tracks implementation tasks, features, and enhancements.
 
 ## 🧠 ML Model
 
-- [ ] Create synthetic bug report dataset (complete vs incomplete)
+ - [x] Create synthetic bug report dataset (complete vs incomplete)
 - [ ] Train TF.js / ONNX model for predictive validation
 - [ ] Add live prediction on field blur or debounce
 
@@ -27,11 +27,11 @@ This document tracks implementation tasks, features, and enhancements.
 
 ## 🧩 Agent System
 
-- [ ] Implement InputWatcherAgent
-- [ ] Implement PredictiveValidatorAgent
-- [ ] Implement FieldExplainerAgent
-- [ ] Implement MemoryManagerAgent
-- [ ] Implement SubmissionAdvisorAgent
+ - [x] Implement InputWatcherAgent
+ - [x] Implement PredictiveValidatorAgent
+ - [x] Implement FieldExplainerAgent
+ - [x] Implement MemoryManagerAgent
+ - [x] Implement SubmissionAdvisorAgent
 
 ## 🧪 Testing
 
@@ -50,5 +50,5 @@ This document tracks implementation tasks, features, and enhancements.
 - [x] Create `README.md` with architecture
 - [x] Create `agents.md`
 - [x] Create `todo.md`
-- [ ] Add `hooks.ts` documentation
-- [ ] Add contributor guidelines
+ - [x] Add `hooks.ts` documentation
+ - [x] Add contributor guidelines

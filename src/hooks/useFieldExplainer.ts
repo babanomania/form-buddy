@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { loadLLM, type LLM } from '../lib/llm'
 
+interface NavigatorWithMemory extends Navigator { deviceMemory?: number }
+interface PerformanceWithMemory extends Performance { memory?: { jsHeapSizeLimit: number } }
+
 function hasEnoughMemory() {
-  const deviceMemory = (navigator as any).deviceMemory || 4
-  const heapLimit = (performance as any).memory?.jsHeapSizeLimit || 0
+  const nav = navigator as NavigatorWithMemory
+  const perf = performance as PerformanceWithMemory
+  const deviceMemory = nav.deviceMemory || 4
+  const heapLimit = perf.memory?.jsHeapSizeLimit || 0
   return deviceMemory >= 4 && heapLimit >= 1.5e9
 }
 
