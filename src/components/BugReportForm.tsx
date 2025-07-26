@@ -112,8 +112,12 @@ export function BugReportForm() {
       [actualRef, 'actual'],
     ]
     const cleanups = refs
-      .filter(([r]) => r.current)
-      .map(([r, field]) => watcher.current.watch(r.current!, field))
+      .map(([r, field]) => {
+        const el = r.current
+        return el && 'addEventListener' in el
+          ? watcher.current.watch(el, field)
+          : () => {}
+      })
     return () => {
       cleanups.forEach((c) => c())
     }
