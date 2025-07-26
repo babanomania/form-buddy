@@ -1,6 +1,37 @@
 # FormBuddy
 
-FormBuddy is a demo bug reporting form that showcases in-browser machine learning and generative AI helpers. It is built with React, TypeScript and Vite and runs entirely offline.
+**FormBuddy** is an intelligent layer on top of [React Hook Form](https://react-hook-form.com/) that makes form filling smarter, friendlier, and more error-resistant — all on the client-side.
+
+Powered by a hybrid of in-browser machine learning and generative AI, FormBuddy actively:
+- Predicts common user errors
+- Explains vague or incomplete inputs
+- Guides users to submit clear, actionable data
+
+(Old) Static Errors        |  (New) Dynamic Errors
+:-------------------------:|:-------------------------:
+![](old_error.png)         |  ![](new_error.png)
+
+
+## Why FormBuddy?
+
+Form validation is no longer just about red borders and `"This field is required."`
+
+**FormBuddy goes further:**
+- Predicts likely mistakes before validation
+- Uses a lightweight ML model trained on real-world errors
+- Integrates a small language model (LLM) to clarify and rephrase inputs
+- Built directly on `react-hook-form`, so it’s composable and idiomatic for React
+
+
+## In-Browser Inference: ML + Gen AI
+
+Modern browsers are surprisingly powerful. FormBuddy proves it by running both:
+
+| Model Type | Technology | Purpose |
+|------------|------------|---------|
+| ML Classifier | TensorFlow.js or ONNX.js | Predicts missing or error-prone fields |
+| LLM (TinyLlama, Qwen3-1.7B, etc.) | WebLLM / Transformers.js / WASM+GGUF | Expands vague text, offers natural language guidance |
+
 
 ## Features
 
@@ -12,19 +43,6 @@ FormBuddy is a demo bug reporting form that showcases in-browser machine learnin
   be changed with `VITE_WEBLLM_MODEL_ID` if you want to load a different
   prebuilt model. By default it uses a TinyLlama variant.
 - **Debug Logging** – set `VITE_LOG_MODEL_IO=true` to print ML and LLM inputs and outputs to the console
-
-## Bug Report Form Fields
-
-- Full Name
-- Email
-- Feedback Type (Bug, Feature, UI Issue)
-- App Version
-- Steps to Reproduce
-- Expected Behavior
-- Actual Behavior
-- Screenshot Upload (optional)
-
-When a field looks incomplete, the predictive model flags it and the field explainer offers a short hint. Everything happens in the browser with no network calls.
 
 ## Using FormBuddy
 
@@ -158,14 +176,23 @@ npm --workspace packages/example run preview
 
 ## Project Structure
 
-This repo now uses **npm workspaces**.
+This repo uses **npm workspaces**.
 
 - `packages/form-buddy` – reusable hooks and agents
-- `packages/example` – demo application
 - `packages/form-buddy/src/hooks/useFormBuddy.ts` – main helper hook
 - `packages/form-buddy/src/lib/classifier.ts` – placeholder ML implementation
 - `packages/form-buddy/src/lib/llm.ts` – mock LLM client
+---
+- `packages/example` – demo application
 - `packages/example/src/components/BugReportForm.tsx` – example form component
 - `packages/example/public/models` – place to store local model files
+---
+- `training/generate_synthetic_data.py` – script to generate synthetic bug report data for training
+- `training/train_model.py` – script to train the bug report classifier and export ONNX model
+- `training/requirements.txt` – Python dependencies for training scripts
 
-FormBuddy demonstrates how far browser‑native intelligence can go for user friendly bug reports.
+## License
+
+MIT License. Feel free to fork and adapt!
+
+> Built with ❤️ to show just how far the modern browser has come — ML, LLMs, and empathy, all without leaving the tab.
