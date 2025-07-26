@@ -60,8 +60,10 @@ export function useFormBuddy<T extends FieldValues>(
   }, [validationModelName, llmName])
 
   const handleBlur = async (name: Path<T>, value: string) => {
+
     if (!modelRef.current || !llmRef.current) return
     setChecking((m) => ({ ...m, [name]: true }))
+
     const key = `${name}|${value}`
     const cached = cache.current.get(key)
     if (cached) {
@@ -69,6 +71,7 @@ export function useFormBuddy<T extends FieldValues>(
       setChecking((m) => ({ ...m, [name]: false }))
       return
     }
+
     const prediction: Prediction = modelRef.current.predict(value)
     if (prediction.score > threshold) {
       const fieldDesc = fieldMap.current[name] || ''
@@ -78,6 +81,7 @@ export function useFormBuddy<T extends FieldValues>(
         fieldDesc,
         prediction.type,
       )
+      
       let prompt: string
       switch (name) {
         case 'steps':

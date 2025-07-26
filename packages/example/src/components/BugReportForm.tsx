@@ -15,8 +15,10 @@ interface FormValues {
   screenshot?: FileList | null
 }
 
+// Description of the form for the assistant
 const FORM_DESCRIPTION = 'Bug report submission form for the FormBuddy demo application.'
 
+// Define the fields and their descriptions
 const FIELDS: FieldDetail[] = [
   { name: 'fullName', description: 'Your full name' },
   { name: 'email', description: 'Contact email address' },
@@ -27,6 +29,23 @@ const FIELDS: FieldDetail[] = [
   { name: 'actual', description: 'Actual behaviour observed' },
 ]
 
+// Function to generate prompts for form-buddy based on field errors
+const getPrompt = (
+  form: string,
+  field: string,
+  error: string,
+) => {
+  switch (error) {
+    case 'missing':
+      return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+    case 'invalid':
+      return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+    default:
+      return defaultPromptGenerator(form, field, error)
+  }
+}
+
+// Validation schema using Yup
 const schema: yup.ObjectSchema<FormValues> = yup.object({
   fullName: yup.string().required('Required'),
   email: yup.string().email('Invalid email').required('Required'),
@@ -46,28 +65,13 @@ const schema: yup.ObjectSchema<FormValues> = yup.object({
 
 function InnerForm() {
   const { register, handleSubmit, trigger, formState: { errors } } = useFormContext<FormValues>()
-  const getPrompt = (
-    form: string,
-    field: string,
-    error: string,
-  ) => {
-    switch (error) {
-      case 'missing':
-        return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
-      case 'invalid':
-        return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
-      default:
-        return defaultPromptGenerator(form, field, error)
-    }
-  }
-
   const { handleBlur, loading, checking } = useFormBuddy<FormValues>(
     FORM_DESCRIPTION,
     FIELDS,
     getPrompt,
     {
       validationModelName: 'bug_report_classifier.onnx',
-      llmModelName: import.meta.env.VITE_WEBLLM_MODEL_ID,
+      llmModelName: 'Qwen3-1.7B-q4f32_1-MLC',
       threshold: 0.7,
     },
   )
