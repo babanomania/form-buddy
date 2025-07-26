@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { loadModel, type Model } from '../lib/ml/model'
+import { loadModel, type Model, type Prediction } from '../lib/ml/model'
 
 export function usePredictiveValidation(enabled = true) {
   const modelRef = useRef<Model | null>(null)
@@ -17,10 +17,10 @@ export function usePredictiveValidation(enabled = true) {
     return loading.current
   }
 
-  return async (value: string) => {
+  return async (value: string): Promise<Prediction | null> => {
     const model = await getModel()
     if (!model) return null
-    const score = model.predict(value)
-    return score > 0.7 ? score : null
+    const result = model.predict(value)
+    return result.score > 0.7 ? result : null
   }
 }

@@ -1,11 +1,17 @@
-export function stepsPrompt(text: string) {
-  return `Suggest clearer reproduction steps for: "${text}"`
+export function stepsPrompt(text: string, reason?: string) {
+  return `The user wrote "${text}" in the Steps to Reproduce field.${
+    reason ? ` The ML model flagged this as ${reason}.` : ''
+  } Suggest clearer, step-by-step instructions.`
 }
 
-export function versionPrompt(text: string) {
-  return `Give a hint about providing a valid version instead of "${text}"`
+export function versionPrompt(text: string, reason?: string) {
+  return `The user entered "${text}" as the app version.${
+    reason ? ` The ML model flagged this as ${reason}.` : ''
+  } Suggest a valid semantic version like 1.2.3.`
 }
 
-export function feedbackTypePrompt(text: string) {
-  return `Help the user pick a feedback type when they entered "${text}"`
+export function feedbackTypePrompt(text: string, reason?: string) {
+  return `The user chose "${text}" for feedback type.${
+    reason ? ` The ML model flagged this as ${reason}.` : ''
+  } Suggest one of: Bug, Feature, or UI Issue.`
 }

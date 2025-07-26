@@ -54,11 +54,15 @@ export function BugReportForm() {
 
   useEffect(() => {
     const handle = async (field: string, value: string) => {
-      const score = await validator.current.check(field, value)
-      if (score) {
+      const result = await validator.current.check(field, value)
+      if (result) {
         let message = 'This field may be incomplete.'
         memory.current.checkMemory()
-        const ex = await explainer.current.getExplanation(field, value)
+        const ex = await explainer.current.getExplanation(
+          field,
+          value,
+          result.type,
+        )
         if (ex) message = ex
         setHints((h) => ({ ...h, [field]: message }))
       } else {
