@@ -7,7 +7,7 @@ const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
 const envModelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-1.7B-q4f32_1-MLC'
 const defaultSystemPrompt =
-  'You are a concise assistant helping users correct and improve short form inputs for a bug report. Avoid long explanations.'
+  'You are Qwen, an efficient assistant for improving bug report form fields. Provide one short, actionable suggestion.'
 
 export async function loadLLM(id: string = envModelId) {
   if (useWebLLM) {

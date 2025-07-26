@@ -16,3 +16,4 @@ The options object supports:
 - `validationModelName` – ONNX model file to load
 - `llmModelName` – WebLLM model identifier
 - `threshold` – confidence score required to trigger the explainer
+- `errorTypes` – list of possible error labels returned by the ML model
