@@ -42,8 +42,10 @@ followed by `npm run preview` to test offline support.
 
 The repository includes a small Python script that trains a text
 classifier on the synthetic bug report dataset and exports it to ONNX
-format.  The resulting file is placed in `public/models` and can be
-loaded by the predictive validation hook.
+format. Each row of the dataset now contains per-field error labels so
+the model can predict issues for individual inputs. The resulting file
+is placed in `public/models` and can be loaded by the predictive
+validation hook.
 
 Install the Python requirements first:
 

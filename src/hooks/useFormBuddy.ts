@@ -9,12 +9,24 @@ export interface FieldDetail {
   description: string
 }
 
+export interface FormBuddyOptions {
+  validationModelName?: string
+  llmModelName?: string
+  threshold?: number
+}
+
 export function useFormBuddy<T extends FieldValues>(
   formDescription: string,
   fields: FieldDetail[],
   promptMap: SystemPromptMap,
+  options: FormBuddyOptions = {},
 ) {
   const { setError } = useFormContext<T>()
+  const {
+    validationModelName,
+    llmModelName: llmName,
+    threshold = 0.7,
+  } = options
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState<Record<string, boolean>>({})
   const [mlModelName, setMLModelName] = useState<string | null>(null)
@@ -28,7 +40,7 @@ export function useFormBuddy<T extends FieldValues>(
 
   useEffect(() => {
     let canceled = false
-    Promise.all([loadModel(), loadLLM()]).then(([model, llm]) => {
+    Promise.all([loadModel(validationModelName), loadLLM(llmName)]).then(([model, llm]) => {
       if (!canceled) {
         modelRef.current = model
         llmRef.current = llm
@@ -40,7 +52,7 @@ export function useFormBuddy<T extends FieldValues>(
     return () => {
       canceled = true
     }
-  }, [])
+  }, [validationModelName, llmName])
 
   const handleBlur = async (name: Path<T>, value: string) => {
     if (!modelRef.current || !llmRef.current) return
@@ -53,7 +65,7 @@ export function useFormBuddy<T extends FieldValues>(
       return
     }
     const prediction: Prediction = modelRef.current.predict(value)
-    if (prediction.score > 0.7) {
+    if (prediction.score > threshold) {
       const fieldDesc = fieldMap.current[name] || ''
       const text = `${value}\n\nForm: ${formDescription}\nField: ${fieldDesc}`
       const systemPromptFn =

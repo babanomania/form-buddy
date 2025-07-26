@@ -51,6 +51,11 @@ function InnerForm() {
     FORM_DESCRIPTION,
     FIELDS,
     defaultSystemPrompts,
+    {
+      validationModelName: 'bug_report_classifier.onnx',
+      llmModelName: import.meta.env.VITE_WEBLLM_MODEL_ID,
+      threshold: 0.7,
+    },
   )
 
   const fullNameField = register('fullName')

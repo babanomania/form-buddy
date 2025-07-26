@@ -11,21 +11,21 @@ function stripThinkTags(text: string) {
 const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
 const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
-const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-1.7B-q4f32_1-MLC'
+const envModelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-1.7B-q4f32_1-MLC'
 const defaultSystemPrompt =
   'You are a concise assistant helping users correct and improve short form inputs for a bug report. Avoid long explanations. Reply in under two sentences using clear, direct language.'
 
-export async function loadLLM() {
+export async function loadLLM(id: string = envModelId) {
   if (useWebLLM) {
     try {
       const { CreateMLCEngine } = await import('@mlc-ai/web-llm')
-      const engine = await CreateMLCEngine(modelId)
+      const engine = await CreateMLCEngine(id)
 
-      console.log('[LLM] Active model:', modelId)
+      console.log('[LLM] Active model:', id)
       console.log('[LLM] System prompt:', defaultSystemPrompt)
 
       return {
-        modelName: modelId,
+        modelName: id,
         explain: async (
           field: string,
           text: string,
@@ -85,7 +85,7 @@ export async function loadLLM() {
 
   await new Promise((resolve) => setTimeout(resolve, 100))
   return {
-    modelName: modelId,
+    modelName: id,
     explain: async (
       field: string,
       text: string,

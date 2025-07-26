@@ -69,40 +69,66 @@ def short_issue() -> str:
 
 
 def generate_entry(label: str) -> dict:
+    errors = {}
+
     if label == "invalid" and random.random() < 0.3:
         full_name = f"{faker.word()} {faker.word()}"
+        errors["fullName"] = "invalid"
     else:
         full_name = faker.name()
+        errors["fullName"] = "ok"
 
     if label == "invalid":
         email = faker.word() + ".com"
+        errors["email"] = "invalid"
     elif label == "incomplete" and random.random() < 0.3:
         email = ""
+        errors["email"] = "missing"
     else:
         email = faker.email()
+        errors["email"] = "ok"
 
     feedback_type = random.choice(FEEDBACK_TYPES)
     screenshot_provided = random.choice([True, False])
 
     app_version = valid_version()
+    errors["appVersion"] = "ok"
     steps = sentence_with_issue()
+    errors["stepsToReproduce"] = "ok"
     expected = f"The app should {faker.word()} without errors."
+    errors["expectedBehavior"] = "ok"
     actual = f"Instead, it {random.choice(ISSUES)}."
+    errors["actualBehavior"] = "ok"
 
     if label == "vague":
         steps = short_issue()
+        errors["stepsToReproduce"] = "vague"
         expected = random.choice(["should work", "should not crash", ""])
+        errors["expectedBehavior"] = "vague" if not expected else "ok"
         actual = random.choice(["didn't", "crashed", ""])
+        errors["actualBehavior"] = "vague" if not actual else "ok"
     elif label == "incomplete":
-        app_version = valid_version() if random.random() < 0.5 else invalid_version()
+        if random.random() < 0.5:
+            app_version = invalid_version()
+            errors["appVersion"] = "invalid"
+        else:
+            app_version = valid_version()
+            errors["appVersion"] = "ok"
         steps = short_issue() if random.random() < 0.5 else ""
+        errors["stepsToReproduce"] = "missing" if not steps else "vague"
         expected = "" if random.random() < 0.5 else "should work"
+        errors["expectedBehavior"] = "missing" if not expected else "ok"
         actual = "" if random.random() < 0.5 else random.choice(["didn't", "crashed"])
+        errors["actualBehavior"] = "missing" if not actual else "ok"
     elif label == "invalid":
         app_version = invalid_version()
+        errors["appVersion"] = "invalid"
         steps = f"{faker.word()} {faker.word()}"
+        errors["stepsToReproduce"] = "vague"
         expected = f"{faker.word()} {faker.word()} {faker.word()}"
+        errors["expectedBehavior"] = "vague"
         actual = f"{faker.word()} {faker.word()}"
+        errors["actualBehavior"] = "vague"
 
     return {
         "fullName": full_name,
@@ -114,6 +140,7 @@ def generate_entry(label: str) -> dict:
         "actualBehavior": actual,
         "screenshotProvided": screenshot_provided,
         "label": label,
+        "errors": errors,
     }
 
 
