@@ -30,7 +30,20 @@ const FIELDS: FieldDetail[] = [
 ]
 
 // Function to generate prompts for form-buddy based on field errors
-const getPrompt = defaultPromptGenerator
+const getPrompt = (
+  form: string,
+  field: string,
+  error: string,
+) => {
+  switch (error) {
+    case 'missing':
+      return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+    case 'invalid':
+      return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+    default:
+      return defaultPromptGenerator(form, field, error)
+  }
+}
 
 // Validation schema using Yup
 const schema: yup.ObjectSchema<FormValues> = yup.object({

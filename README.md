@@ -71,10 +71,23 @@ When a field looks incomplete, the predictive model flags it and the field expla
 
 3. **Train the classifier.** Run `python training/train_model.py` to produce an ONNX model. The script reads the dataset, trains a logistic regression pipeline and writes `bug_report_classifier.onnx` to `packages/example/public/models`.
 
-4. **Define system prompts.** Prompts are generated dynamically based on form description, field description and the ML error type. The example simply reuses the default generator:
+4. **Define system prompts.** Prompts are generated dynamically based on form description, field description and the ML error type. The example application defines a helper:
 
    ```ts
-   const getPrompt = defaultPromptGenerator
+   const getPrompt = (
+      form: string,
+      field: string,
+      error: string,
+    ) => {
+      switch (error) {
+        case 'missing':
+          return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+        case 'invalid':
+          return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+        default:
+          return defaultPromptGenerator(form, field, error)
+      }
+    }
    ```
 
 5. **Use the hook.** Call `useFormBuddy` inside your form component:
