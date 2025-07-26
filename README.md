@@ -62,6 +62,7 @@ python scripts/train_model.py
 - `src/components/BugReportForm.tsx` – main form component
 - `src/hooks/usePredictiveValidation.ts` – loads and runs the ML model
 - `src/hooks/useFieldExplainer.ts` – loads the LLM and provides text suggestions
+- `src/hooks/useFormBuddy.ts` – high level helper that ties everything together
 - `src/lib/ml/model.ts` – placeholder ML implementation
 - `src/lib/llm/index.ts` – mock LLM client
 - `public/models` – place to store local model files
