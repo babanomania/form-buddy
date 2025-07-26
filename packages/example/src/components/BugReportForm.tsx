@@ -29,17 +29,20 @@ const FIELDS: FieldDetail[] = [
   { name: 'actual', description: 'Actual behaviour observed' },
 ]
 
-// Function to generate prompts for form-buddy based on field errors
+// Generate more detailed prompts based on the detected error type
 const getPrompt = (
   form: string,
   field: string,
   error: string,
 ) => {
+  const base = `You are assisting with the "${form}" form.`
   switch (error) {
     case 'missing':
-      return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+      return `${base} The user left the "${field}" field empty. Explain in one sentence what information should be provided.`
     case 'invalid':
-      return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+      return `${base} The value for "${field}" looks invalid. Give a brief example of a valid entry.`
+    case 'too short':
+      return `${base} The input in "${field}" is too short. Suggest how to make it more descriptive.`
     default:
       return defaultPromptGenerator(form, field, error)
   }
