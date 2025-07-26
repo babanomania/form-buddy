@@ -6,18 +6,15 @@ import {
 
 const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
 const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
-// Allow overriding the model id so that consumers can choose any model
-// supported by their version of WebLLM. Default to a small model known to
-// exist in `prebuiltAppConfig`.
-const modelId =
-  import.meta.env.VITE_WEBLLM_MODEL_ID ||
-  'TinyLlama-1.1B-Chat-v1.0-q4f16_1-MLC'
+
+const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'TinyLlama-1.1B-Chat-v1.0-q4f32_1-MLC'
 
 export async function loadLLM() {
   if (useWebLLM) {
     try {
       const { CreateMLCEngine } = await import('@mlc-ai/web-llm')
       const engine = await CreateMLCEngine(modelId)
+      
       return {
         explain: async (field: string, text: string) => {
           let prompt: string
@@ -34,13 +31,22 @@ export async function loadLLM() {
             default:
               prompt = `Provide feedback about: "${text}"`
           }
+          
+          console.log('[LLM] Generating explanation for field:', field, 'with prompt:', prompt);
           const reply = await engine.chat.completions.create({
             messages: [{ role: 'user', content: prompt }],
           })
+          
+          if (!reply.choices || reply.choices.length === 0) {
+            console.error('[LLM] No choices returned from WebLLM')
+            return `⚠️ Unable to provide explanation for "${text}"`
+          }
           const out = reply.choices[0].message.content as string
+
           if (logIO) {
             console.log('[LLM] field:', field, 'input:', text, 'output:', out)
           }
+          
           return out
         },
       }
