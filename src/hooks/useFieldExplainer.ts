@@ -29,12 +29,22 @@ export function useFieldExplainer(enabled = true) {
     }
   }, [enabled, llm])
 
-  return async (value: string) => {
-    if (!llm || !hasEnoughMemory()) return null
-    if (value.trim().length < 10) {
-      return llm.explain(value)
-    }
+  const fallbackExplain = (field: string, value: string) => {
+    if (field === 'steps' && value.trim().length < 10)
+      return 'Please provide detailed steps to reproduce the issue.'
+    if (field === 'version' && !/\d+\.\d+\.\d+/.test(value))
+      return 'Please enter a valid version like 1.2.3.'
+    if (field === 'feedbackType' && !['Bug', 'Feature', 'UI Issue'].includes(value))
+      return 'Choose a feedback type: Bug, Feature, or UI Issue.'
     return null
+  }
+
+  return async (field: string, value: string) => {
+    if (llm && hasEnoughMemory()) {
+      const res = await llm.explain(field, value)
+      return res
+    }
+    return fallbackExplain(field, value)
   }
 }
 

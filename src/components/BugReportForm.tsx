@@ -54,10 +54,8 @@ export function BugReportForm() {
       if (score) {
         let message = 'This field may be incomplete.'
         memory.current.checkMemory()
-        if (memory.current.isLLMEnabled()) {
-          const ex = await explainer.current.getExplanation(value)
-          if (ex) message = ex
-        }
+        const ex = await explainer.current.getExplanation(field, value)
+        if (ex) message = ex
         setHints((h) => ({ ...h, [field]: message }))
       } else {
         setHints((h) => ({ ...h, [field]: '' }))

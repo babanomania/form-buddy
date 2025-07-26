@@ -1,13 +1,15 @@
-export type Explainer = (value: string) => Promise<string | null>
+export type Explainer = (field: string, value: string) => Promise<string | null>
 
 export interface FieldExplainerAgent {
-  getExplanation(value: string): Promise<string | null>
+  getExplanation(field: string, value: string): Promise<string | null>
 }
 
-export function createFieldExplainerAgent(explain: Explainer): FieldExplainerAgent {
+export function createFieldExplainerAgent(
+  explain: Explainer,
+): FieldExplainerAgent {
   return {
-    getExplanation(value) {
-      return explain(value)
+    getExplanation(field, value) {
+      return explain(field, value)
     },
   }
 }

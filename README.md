@@ -6,8 +6,8 @@ FormBuddy is a demo bug reporting form that showcases in-browser machine learnin
 
 - **React Hook Form** for standard form management and validation
 - **Predictive Validation** using a lightweight TensorFlow.js model
-- **Field Explanation** powered by a mocked WebLLM client
-- **Memory Aware** – the LLM features are automatically disabled on devices with low memory (use `VITE_LOW_MEMORY=true` in development to simulate)
+- **Field Explanation** powered by a mocked WebLLM client with reusable prompt templates
+- **Memory Aware** – the LLM features are automatically disabled on devices with low memory (use `VITE_LOW_MEMORY=true` in development to simulate) and fall back to static hints
 
 ## Bug Report Form Fields
 
