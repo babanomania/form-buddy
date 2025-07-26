@@ -31,16 +31,16 @@ When a field looks incomplete, the predictive model flags it and the field expla
 1. **Identify your form.** Determine the form description and list of fields. For a bug report form we use:
 
    ```ts
-   const FORM_DESCRIPTION = 'Bug report submission form for the FormBuddy demo application.'
-   const FIELDS = [
-     { name: 'fullName', description: 'Your full name' },
-     { name: 'email', description: 'Contact email address' },
-     { name: 'feedbackType', description: 'Bug, Feature or UI Issue' },
-     { name: 'version', description: 'Application version number' },
-     { name: 'steps', description: 'Steps to reproduce the problem' },
-     { name: 'expected', description: 'Expected behaviour of the application' },
-     { name: 'actual', description: 'Actual behaviour observed' },
-   ]
+   const FORM_DESCRIPTION = 'Bug report submission form for an application. It collects user feedback on bugs, features, and UI issues.'
+   const FIELDS: FieldDetail[] = [
+      { name: 'fullName', description: 'full name' },
+      { name: 'email', description: 'contact email address' },
+      { name: 'feedbackType', description: 'Bug, Feature or UI Issue' },
+      { name: 'version', description: 'application version number' },
+      { name: 'steps', description: 'steps to reproduce the problem' },
+      { name: 'expected', description: 'expected behaviour of the application' },
+      { name: 'actual', description: 'actual behaviour observed' },
+    ]
    ```
 
 2. **Create labelled data.** A small synthetic dataset is generated with `training/generate_synthetic_data.py` and looks like:
@@ -79,11 +79,14 @@ When a field looks incomplete, the predictive model flags it and the field expla
       field: string,
       error: string,
     ) => {
+      const base = `You are assisting with the "${form}" form.`
       switch (error) {
         case 'missing':
-          return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+          return `${base} The user left the "${field}" field empty. Explain in one sentence what information should be provided.`
         case 'invalid':
-          return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+          return `${base} The value for "${field}" looks invalid. Give a brief example of a valid entry.`
+        case 'too short':
+          return `${base} The input in "${field}" is too short. Suggest how to make it more descriptive.`
         default:
           return defaultPromptGenerator(form, field, error)
       }
