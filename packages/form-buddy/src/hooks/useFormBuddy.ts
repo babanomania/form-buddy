@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useFormContext, type FieldValues, type Path } from 'react-hook-form'
 import { loadModel, type Model, type Prediction } from '../lib/classifier'
 import { loadLLM, type LLM } from '../lib/llm'
-import type { SystemPromptMap } from '../prompts'
+import type { SystemPromptGenerator } from '../prompts'
 import {
   feedbackTypePrompt,
   stepsPrompt,
@@ -23,7 +23,7 @@ export interface FormBuddyOptions {
 export function useFormBuddy<T extends FieldValues>(
   formDescription: string,
   fields: FieldDetail[],
-  promptMap: SystemPromptMap,
+  getSystemPrompt: SystemPromptGenerator,
   options: FormBuddyOptions = {},
 ) {
   const { setError } = useFormContext<T>()
@@ -73,9 +73,11 @@ export function useFormBuddy<T extends FieldValues>(
     if (prediction.score > threshold) {
       const fieldDesc = fieldMap.current[name] || ''
       const text = `${value}\n\nForm: ${formDescription}\nField: ${fieldDesc}`
-      const systemPromptFn =
-        promptMap[prediction.type] || promptMap.default
-      const systemPrompt = systemPromptFn(formDescription, fieldDesc)
+      const systemPrompt = getSystemPrompt(
+        formDescription,
+        fieldDesc,
+        prediction.type,
+      )
       let prompt: string
       switch (name) {
         case 'steps':

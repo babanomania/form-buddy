@@ -2,7 +2,7 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextFiel
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { useFormBuddy, type FieldDetail, defaultSystemPrompts } from 'form-buddy'
+import { useFormBuddy, type FieldDetail, defaultPromptGenerator } from 'form-buddy'
 
 interface FormValues {
   fullName: string
@@ -46,10 +46,25 @@ const schema: yup.ObjectSchema<FormValues> = yup.object({
 
 function InnerForm() {
   const { register, handleSubmit, trigger, formState: { errors } } = useFormContext<FormValues>()
+  const getPrompt = (
+    form: string,
+    field: string,
+    error: string,
+  ) => {
+    switch (error) {
+      case 'missing':
+        return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+      case 'invalid':
+        return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+      default:
+        return defaultPromptGenerator(form, field, error)
+    }
+  }
+
   const { handleBlur, loading, checking } = useFormBuddy<FormValues>(
     FORM_DESCRIPTION,
     FIELDS,
-    defaultSystemPrompts,
+    getPrompt,
     {
       validationModelName: 'bug_report_classifier.onnx',
       llmModelName: import.meta.env.VITE_WEBLLM_MODEL_ID,
