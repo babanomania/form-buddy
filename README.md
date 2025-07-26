@@ -61,13 +61,15 @@ python scripts/train_model.py
 
 ## Project Structure
 
-- `src/components/BugReportForm.tsx` – main form component
-- `src/hooks/usePredictiveValidation.ts` – loads and runs the ML model
-- `src/hooks/useFieldExplainer.ts` – loads the LLM and provides text suggestions
-- `src/hooks/useFormBuddy.ts` – high level helper that ties everything together
-- `src/lib/ml/model.ts` – placeholder ML implementation
-- `src/lib/llm/index.ts` – mock LLM client
-- `public/models` – place to store local model files
+This repo now uses **npm workspaces**.
+
+- `packages/form-buddy` – reusable hooks and agents
+- `packages/example` – demo application
+- `packages/form-buddy/src/hooks/useFormBuddy.ts` – main helper hook
+- `packages/form-buddy/src/lib/ml/model.ts` – placeholder ML implementation
+- `packages/form-buddy/src/lib/llm/index.ts` – mock LLM client
+- `packages/example/src/components/BugReportForm.tsx` – example form component
+- `packages/example/public/models` – place to store local model files
 
 FormBuddy demonstrates how far browser‑native intelligence can go for user friendly bug reports.
 

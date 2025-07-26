@@ -2,8 +2,7 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextFiel
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { useFormBuddy, type FieldDetail } from '../hooks/useFormBuddy'
-import { defaultSystemPrompts } from '../lib/llm/systemPrompts'
+import { useFormBuddy, type FieldDetail, defaultSystemPrompts } from 'form-buddy'
 
 interface FormValues {
   fullName: string
