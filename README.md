@@ -95,16 +95,42 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
     }
    ```
 
+
 5. **Use the hook.** Call `useFormBuddy` inside your form component:
 
    ```tsx
-   const { handleBlur } = useFormBuddy(FORM_DESCRIPTION, FIELDS, getPrompt, {
+   const { handleBlur, loading, checking  } = useFormBuddy(FORM_DESCRIPTION, FIELDS, getPrompt, {
      validationModelName: 'bug_report_classifier.onnx',
      llmModelName: 'Qwen3-1.7B-q4f32_1-MLC',
      errorTypes: ['invalid', 'missing', 'vague', 'ok']
    })
    ```
 
+6. **Integrate `handleBlur`, `checking`, and `loading` in your form fields.**
+
+   Use `handleBlur` in your field's `onBlur` callback to trigger predictive validation and LLM hints. Use `checking` to show per-field loading states, and `loading` to check if the models are still initializing. Example:
+
+   ```tsx
+   <TextField
+     label="Full Name"
+     {...register('fullName')}
+     onBlur={async (e) => {
+       // Call the default onBlur
+       register('fullName').onBlur(e)
+       // Run schema validation first
+       const valid = await trigger('fullName')
+       // If valid, trigger FormBuddy's ML/LLM helpers
+       if (valid) await handleBlur('fullName', e.target.value)
+     }}
+     error={!!errors.fullName}
+     helperText={checking.fullName ? 'Checking...' : errors.fullName?.message || ' '}
+   />
+
+   {/* Show a global loading indicator while models are initializing */}
+   {loading && <small>Initializing assistant...</small>}
+   ```
+
+   Repeat this pattern for other fields, using the appropriate field name and error state.
 
 ## Training the ML model
 
@@ -157,6 +183,68 @@ To verify the service worker and production build, run:
 npm --workspace packages/example run build
 npm --workspace packages/example run preview
 ```
+
+
+## Spec: `useFormBuddy` API
+
+### Hook Signature
+
+```ts
+function useFormBuddy<T extends Record<string, any>>(
+  formDescription: string,
+  fields: FieldDetail[],
+  getPrompt: (form: string, field: string, error: string) => string,
+  options?: {
+    validationModelName?: string
+    llmModelName?: string
+    errorTypes?: string[]
+    threshold?: number
+  }
+): {
+  handleBlur: (field: keyof T, value: any) => Promise<void>
+  loading: boolean
+  checking: Record<keyof T, boolean>
+}
+```
+
+### Input Parameters
+
+- **formDescription** (`string`):
+  - A human-readable description of the form's purpose. Used in prompt generation for LLM explanations.
+
+- **fields** (`FieldDetail[]`):
+  - An array of objects describing each form field.
+  - `FieldDetail` type:
+    ```ts
+    interface FieldDetail {
+      name: string // Field name (should match your form data keys)
+      description: string // Short description of the field's purpose
+    }
+    ```
+
+- **getPrompt** (`(form: string, field: string, error: string) => string`):
+  - A function that returns a system prompt for the LLM, given the form description, field description, and error type.
+
+- **options** (optional object):
+  - `validationModelName` (`string`): Filename of the ONNX model for predictive validation.
+  - `llmModelName` (`string`): Model ID for the LLM (e.g., TinyLlama, Qwen3-1.7B, etc).
+  - `errorTypes` (`string[]`): List of error types the model can return (e.g., `['missing', 'invalid', 'vague', 'ok']`).
+  - `threshold` (`number`): Confidence threshold for predictive validation (default: 0.5).
+
+### Return Value
+
+The hook returns an object with the following properties:
+
+- **handleBlur** (`(field: keyof T, value: any) => Promise<void>`):
+  - Call this in your field's `onBlur` handler to trigger predictive validation and LLM hint generation for that field.
+
+- **loading** (`boolean`):
+  - `true` while the ML/LLM models are loading or initializing. Use to show a global loading indicator.
+
+- **checking** (`Record<keyof T, boolean>`):
+  - An object mapping each field name to a boolean. `true` if that field is currently being checked by the ML/LLM pipeline (e.g., after `handleBlur`).
+
+---
 
 ## Project Structure
 
