@@ -1,0 +1,20 @@
+[
+  {
+    "fullName": "Alice Example",
+    "email": "alice@example.com",
+    "feedbackType": "Bug",
+    "version": "1.0.0",
+    "steps": "Open app and click save",
+    "expected": "File saves correctly",
+    "actual": "App crashes"
+  },
+  {
+    "fullName": "Bob Example",
+    "email": "bob@example.com",
+    "feedbackType": "UI Issue",
+    "version": "1.2.3",
+    "steps": "Resize window",
+    "expected": "Layout adjusts",
+    "actual": "Buttons overlap"
+  }
+]
