@@ -6,4 +6,4 @@ This project provides small React hooks used by the agent system.
 Loads a lightweight ML model and returns an async function that scores a field's value. If the model is not loaded yet, the function resolves to `null`.
 
 ## `useFieldExplainer`
-Loads a browser friendly LLM and returns an async function that can provide a short explanation for vague input. The hook checks memory limits before loading the model.
+Loads a browser friendly LLM and returns an async function that can provide a short explanation for vague input. The hook checks memory limits before loading the model. Set `VITE_LOW_MEMORY=true` to simulate a low-memory environment during development.
