@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useFormContext, type FieldValues, type Path } from 'react-hook-form'
 import { loadModel, type Model, type Prediction } from '../lib/ml/model'
 import { loadLLM, type LLM } from '../lib/llm'
+import type { SystemPromptMap } from '../lib/llm/systemPrompts'
 
 export interface FieldDetail {
   name: string
@@ -11,10 +12,13 @@ export interface FieldDetail {
 export function useFormBuddy<T extends FieldValues>(
   formDescription: string,
   fields: FieldDetail[],
+  promptMap: SystemPromptMap,
 ) {
   const { setError } = useFormContext<T>()
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState<Record<string, boolean>>({})
+  const [mlModelName, setMLModelName] = useState<string | null>(null)
+  const [llmModelName, setLLMModelName] = useState<string | null>(null)
   const modelRef = useRef<Model | null>(null)
   const llmRef = useRef<LLM | null>(null)
   const cache = useRef(new Map<string, string>())
@@ -28,6 +32,8 @@ export function useFormBuddy<T extends FieldValues>(
       if (!canceled) {
         modelRef.current = model
         llmRef.current = llm
+        setMLModelName(model.modelName)
+        setLLMModelName(llm.modelName)
         setLoading(false)
       }
     })
@@ -50,10 +56,14 @@ export function useFormBuddy<T extends FieldValues>(
     if (prediction.score > 0.7) {
       const fieldDesc = fieldMap.current[name] || ''
       const text = `${value}\n\nForm: ${formDescription}\nField: ${fieldDesc}`
+      const systemPromptFn =
+        promptMap[prediction.type] || promptMap.default
+      const systemPrompt = systemPromptFn(formDescription, fieldDesc)
       const message = await llmRef.current.explain(
         name,
         text,
         prediction.type,
+        systemPrompt,
       )
       if (message) {
         cache.current.set(key, message)
@@ -63,5 +73,11 @@ export function useFormBuddy<T extends FieldValues>(
     setChecking((m) => ({ ...m, [name]: false }))
   }
 
-  return { handleBlur, loading, checking }
+  return {
+    handleBlur,
+    loading,
+    checking,
+    mlModelName,
+    llmModelName,
+  }
 }

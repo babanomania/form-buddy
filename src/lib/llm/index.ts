@@ -12,7 +12,7 @@ const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
 const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
 const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-1.7B-q4f32_1-MLC'
-const systemPrompt =
+const defaultSystemPrompt =
   'You are a concise assistant helping users correct and improve short form inputs for a bug report. Avoid long explanations. Reply in under two sentences using clear, direct language.'
 
 export async function loadLLM() {
@@ -22,13 +22,15 @@ export async function loadLLM() {
       const engine = await CreateMLCEngine(modelId)
 
       console.log('[LLM] Active model:', modelId)
-      console.log('[LLM] System prompt:', systemPrompt)
+      console.log('[LLM] System prompt:', defaultSystemPrompt)
 
       return {
+        modelName: modelId,
         explain: async (
           field: string,
           text: string,
           errorType: string | null,
+          systemPrompt: string = defaultSystemPrompt,
         ) => {
           let prompt: string
           switch (field) {
@@ -83,11 +85,14 @@ export async function loadLLM() {
 
   await new Promise((resolve) => setTimeout(resolve, 100))
   return {
+    modelName: modelId,
     explain: async (
       field: string,
       text: string,
       errorType: string | null,
+      systemPrompt: string = defaultSystemPrompt,
     ) => {
+      void systemPrompt
       let out: string
       switch (field) {
         case 'steps':
