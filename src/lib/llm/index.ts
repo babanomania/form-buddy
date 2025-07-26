@@ -5,6 +5,7 @@ import {
 } from './prompts'
 
 const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
+const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
 export async function loadLLM() {
   if (useWebLLM) {
@@ -30,7 +31,11 @@ export async function loadLLM() {
           const reply = await engine.chat.completions.create({
             messages: [{ role: 'user', content: prompt }],
           })
-          return reply.choices[0].message.content as string
+          const out = reply.choices[0].message.content as string
+          if (logIO) {
+            console.log('[LLM] field:', field, 'input:', text, 'output:', out)
+          }
+          return out
         },
       }
     } catch (err) {
@@ -41,16 +46,24 @@ export async function loadLLM() {
   await new Promise((resolve) => setTimeout(resolve, 100))
   return {
     explain: async (field: string, text: string) => {
+      let out: string
       switch (field) {
         case 'steps':
-          return `⚠️ ${stepsPrompt(text)}`
+          out = `⚠️ ${stepsPrompt(text)}`
+          break
         case 'version':
-          return `⚠️ ${versionPrompt(text)}`
+          out = `⚠️ ${versionPrompt(text)}`
+          break
         case 'feedbackType':
-          return `⚠️ ${feedbackTypePrompt(text)}`
+          out = `⚠️ ${feedbackTypePrompt(text)}`
+          break
         default:
-          return `Consider providing more detail about: "${text}"`
+          out = `Consider providing more detail about: "${text}"`
       }
+      if (logIO) {
+        console.log('[LLM] field:', field, 'input:', text, 'output:', out)
+      }
+      return out
     },
   }
 }
