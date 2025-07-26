@@ -87,8 +87,8 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
           return `${base} The user left the "${field}" field empty. Explain in one sentence what information should be provided.`
         case 'invalid':
           return `${base} The value for "${field}" looks invalid. Give a brief example of a valid entry.`
-        case 'too short':
-          return `${base} The input in "${field}" is too short. Suggest how to make it more descriptive.`
+        case 'vague':
+          return `${base} The input in "${field}" is unclear. Suggest how to make it more descriptive.`
         default:
           return defaultPromptGenerator(form, field, error)
       }
@@ -101,7 +101,7 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
    const { handleBlur } = useFormBuddy(FORM_DESCRIPTION, FIELDS, getPrompt, {
      validationModelName: 'bug_report_classifier.onnx',
      llmModelName: import.meta.env.VITE_WEBLLM_MODEL_ID,
-     errorTypes: ['missing', 'too short', 'ok'], // will be alphabetically sorted
+     errorTypes: ['invalid', 'missing', 'vague', 'ok'], // will be alphabetically sorted
    })
    ```
 
