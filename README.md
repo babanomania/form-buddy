@@ -26,19 +26,77 @@ FormBuddy is a demo bug reporting form that showcases in-browser machine learnin
 
 When a field looks incomplete, the predictive model flags it and the field explainer offers a short hint. Everything happens in the browser with no network calls.
 
-## Development
+## Using FormBuddy
 
-```bash
-npm install
-npm run dev
-```
+1. **Identify your form.** Determine the form description and list of fields. For a bug report form we use:
 
-Open `http://localhost:5173` to try it out.
+   ```ts
+   const FORM_DESCRIPTION = 'Bug report submission form for the FormBuddy demo application.'
+   const FIELDS = [
+     { name: 'fullName', description: 'Your full name' },
+     { name: 'email', description: 'Contact email address' },
+     { name: 'feedbackType', description: 'Bug, Feature or UI Issue' },
+     { name: 'version', description: 'Application version number' },
+     { name: 'steps', description: 'Steps to reproduce the problem' },
+     { name: 'expected', description: 'Expected behaviour of the application' },
+     { name: 'actual', description: 'Actual behaviour observed' },
+   ]
+   ```
 
-The service worker is only registered in production builds. Run `npm run build`
-followed by `npm run preview` to test offline support.
+2. **Create labelled data.** A small synthetic dataset is generated with `training/generate_synthetic_data.py` and looks like:
 
-### Training the ML model
+   ```json
+   {
+     "fullName": "Hannah Stevens",
+     "email": "rebecca75@example.org",
+     "feedbackType": "UI Issue",
+     "appVersion": "v1",
+     "stepsToReproduce": "",
+     "expectedBehavior": "",
+     "actualBehavior": "",
+     "screenshotProvided": false,
+     "label": "incomplete",
+     "errors": {
+       "fullName": "ok",
+       "email": "ok",
+       "appVersion": "invalid",
+       "stepsToReproduce": "missing",
+       "expectedBehavior": "missing",
+       "actualBehavior": "missing"
+     }
+   }
+   ```
+
+   The full dataset is saved to `training/bug_reports_data.json` and is used to train the classifier.
+
+3. **Train the classifier.** Run `python training/train_model.py` to produce an ONNX model. The script reads the dataset, trains a logistic regression pipeline and writes `bug_report_classifier.onnx` to `packages/example/public/models`.
+
+4. **Define system prompts.** Prompts are generated dynamically based on form description, field description and the ML error type. The example application defines a helper:
+
+   ```ts
+   const getPrompt = (form: string, field: string, error: string) => {
+     switch (error) {
+       case 'missing':
+         return `You are assisting with the "${form}" form. The field "${field}" is missing information. Provide a short suggestion.`
+       case 'invalid':
+         return `You are assisting with the "${form}" form. The field "${field}" looks invalid. Explain briefly how to fix it.`
+       default:
+         return defaultPromptGenerator(form, field, error)
+     }
+   }
+   ```
+
+5. **Use the hook.** Call `useFormBuddy` inside your form component:
+
+   ```tsx
+   const { handleBlur } = useFormBuddy(FORM_DESCRIPTION, FIELDS, getPrompt, {
+     validationModelName: 'bug_report_classifier.onnx',
+     llmModelName: import.meta.env.VITE_WEBLLM_MODEL_ID,
+   })
+   ```
+
+
+## Training the ML model
 
 The repository includes a small Python script that trains a text
 classifier on the synthetic bug report dataset and exports it to ONNX
@@ -56,7 +114,25 @@ pip install -r requirements.txt
 Then run the training script:
 
 ```bash
-python scripts/train_model.py
+python training/train_model.py
+```
+
+## Testing
+
+Run the example project locally with:
+
+```bash
+npm install
+npm --workspace packages/example run dev
+```
+
+Open `http://localhost:5173` to try it out.
+
+To verify the service worker and production build, run:
+
+```bash
+npm --workspace packages/example run build
+npm --workspace packages/example run preview
 ```
 
 ## Project Structure
