@@ -30,12 +30,19 @@ def load_data():
     texts = []
     labels = []
     for entry in data:
-        errors = entry.get("errors", {})
-        for field in FIELDS:
-            value = entry.get(field, "")
-            label = errors.get(field, "ok")
-            texts.append(f"{field}: {value}")
-            labels.append(label)
+        errors = entry.get("errors")
+        if errors:
+            for field in FIELDS:
+                value = entry.get(field, "")
+                label = errors.get(field, "ok")
+                texts.append(f"{field}: {value}")
+                labels.append(label)
+        else:
+            label = entry.get("label", "ok")
+            for field in FIELDS:
+                value = entry.get(field, "")
+                texts.append(f"{field}: {value}")
+                labels.append(label)
     return texts, labels
 
 
