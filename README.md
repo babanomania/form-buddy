@@ -101,7 +101,7 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
    const { handleBlur } = useFormBuddy(FORM_DESCRIPTION, FIELDS, getPrompt, {
      validationModelName: 'bug_report_classifier.onnx',
      llmModelName: import.meta.env.VITE_WEBLLM_MODEL_ID,
-     errorTypes: ['missing', 'too short', 'ok'],
+     errorTypes: ['missing', 'too short', 'ok'], // will be alphabetically sorted
    })
    ```
 
