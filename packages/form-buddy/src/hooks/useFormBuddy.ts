@@ -3,11 +3,6 @@ import { useFormContext, type FieldValues, type Path } from 'react-hook-form'
 import { loadModel, type Model, type Prediction } from '../lib/classifier'
 import { loadLLM, type LLM } from '../lib/llm'
 import type { SystemPromptGenerator } from '../prompts'
-import {
-  feedbackTypePrompt,
-  stepsPrompt,
-  versionPrompt,
-} from '../prompts'
 
 export interface FieldDetail {
   name: string
@@ -18,6 +13,7 @@ export interface FormBuddyOptions {
   validationModelName?: string
   llmModelName?: string
   threshold?: number
+  errorTypes?: string[]
 }
 
 export function useFormBuddy<T extends FieldValues>(
@@ -31,6 +27,7 @@ export function useFormBuddy<T extends FieldValues>(
     validationModelName,
     llmModelName: llmName,
     threshold = 0.7,
+    errorTypes,
   } = options
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState<Record<string, boolean>>({})
@@ -45,7 +42,7 @@ export function useFormBuddy<T extends FieldValues>(
 
   useEffect(() => {
     let canceled = false
-    Promise.all([loadModel(validationModelName), loadLLM(llmName)]).then(([model, llm]) => {
+    Promise.all([loadModel(validationModelName, errorTypes), loadLLM(llmName)]).then(([model, llm]) => {
       if (!canceled) {
         modelRef.current = model
         llmRef.current = llm
@@ -57,7 +54,7 @@ export function useFormBuddy<T extends FieldValues>(
     return () => {
       canceled = true
     }
-  }, [validationModelName, llmName])
+  }, [validationModelName, llmName, errorTypes])
 
   const handleBlur = async (name: Path<T>, value: string) => {
 
@@ -82,22 +79,9 @@ export function useFormBuddy<T extends FieldValues>(
         prediction.type,
       )
       
-      let prompt: string
-      switch (name) {
-        case 'steps':
-          prompt = stepsPrompt(text, prediction.type)
-          break
-        case 'version':
-          prompt = versionPrompt(text, prediction.type)
-          break
-        case 'feedbackType':
-          prompt = feedbackTypePrompt(text, prediction.type)
-          break
-        default:
-          prompt = `Provide feedback about: "${text}"${
-            prediction.type ? ` The ML model flagged this as ${prediction.type}.` : ''
-          }`
-      }
+      const prompt = `${text}${
+        prediction.type ? `\n\nReason: ${prediction.type}` : ''
+      }`
       const message = await llmRef.current.explain(prompt, systemPrompt)
       if (message) {
         cache.current.set(key, message)

@@ -7,14 +7,17 @@ export interface Prediction {
 
 const defaultModelName = 'bug_report_classifier.onnx'
 
-export async function loadModel(name: string = defaultModelName) {
+export async function loadModel(
+  name: string = defaultModelName,
+  errorTypes: string[] = ['missing', 'too short', 'ok'],
+) {
   // Use a predictable mock when running in test mode
   if (import.meta.env.VITE_TEST_MODE === 'true') {
     return {
       modelName: name,
       predict: (value: string): Prediction => {
         void value
-        const result = { score: 0.9, type: 'incomplete' } as Prediction
+        const result = { score: 0.9, type: errorTypes[0] || 'incomplete' } as Prediction
         if (logIO) {
           console.log('[ML] input:', value, 'score:', result.score, 'type:', result.type)
         }
@@ -30,16 +33,15 @@ export async function loadModel(name: string = defaultModelName) {
     predict: (input: string): Prediction => {
       const trimmed = input.trim()
       let score: number
-      let type: string
-      if (!trimmed) {
+      let type: string = errorTypes[errorTypes.length - 1] || 'ok'
+      if (!trimmed && errorTypes[0]) {
         score = 0.9
-        type = 'missing'
-      } else if (trimmed.length < 10) {
+        type = errorTypes[0]
+      } else if (trimmed.length < 10 && errorTypes[1]) {
         score = 0.8
-        type = 'too short'
+        type = errorTypes[1]
       } else {
         score = 0.2
-        type = 'ok'
       }
       if (logIO) {
         console.log('[ML] input:', input, 'score:', score, 'type:', type)
