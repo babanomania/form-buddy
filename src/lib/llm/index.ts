@@ -7,14 +7,31 @@ import {
 const useWebLLM = import.meta.env.VITE_USE_WEBLLM === 'true'
 const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
 
-const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'TinyLlama-1.1B-Chat-v1.0-q4f32_1-MLC'
+const modelId = import.meta.env.VITE_WEBLLM_MODEL_ID || 'Qwen3-0.5B-Chat-q4f32_0'
+const fallbackModelId = 'RedPajama-INCITE-Chat-3B-v1-q4f32_0'
+const systemPrompt =
+  'You are a concise assistant helping users correct and improve short form inputs for a bug report. Avoid long explanations. Reply in under two sentences using clear, direct language.'
 
 export async function loadLLM() {
   if (useWebLLM) {
     try {
       const { CreateMLCEngine } = await import('@mlc-ai/web-llm')
-      const engine = await CreateMLCEngine(modelId)
-      
+      let engine
+      let activeModel = modelId
+      try {
+        engine = await CreateMLCEngine(modelId)
+      } catch (err) {
+        console.warn(
+          `[LLM] Failed to load model ${modelId}, falling back to ${fallbackModelId}`,
+          err,
+        )
+        engine = await CreateMLCEngine(fallbackModelId)
+        activeModel = fallbackModelId
+      }
+
+      console.log('[LLM] Active model:', activeModel)
+      console.log('[LLM] System prompt:', systemPrompt)
+
       return {
         explain: async (field: string, text: string) => {
           let prompt: string
@@ -32,16 +49,18 @@ export async function loadLLM() {
               prompt = `Provide feedback about: "${text}"`
           }
           
-          console.log('[LLM] Generating explanation for field:', field, 'with prompt:', prompt);
+          console.log('[LLM] Generating explanation for field:', field, 'with prompt:', prompt)
           const reply = await engine.chat.completions.create({
-            messages: [{ role: 'user', content: prompt }],
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: prompt },
+            ],
+            max_tokens: 150,
+            temperature: 0.7,
           })
-          
-          if (!reply.choices || reply.choices.length === 0) {
-            console.error('[LLM] No choices returned from WebLLM')
-            return `⚠️ Unable to provide explanation for "${text}"`
-          }
-          const out = reply.choices[0].message.content as string
+
+          const out =
+            reply.choices?.[0]?.message?.content ?? 'Could not generate suggestion.'
 
           if (logIO) {
             console.log('[LLM] field:', field, 'input:', text, 'output:', out)
@@ -61,16 +80,16 @@ export async function loadLLM() {
       let out: string
       switch (field) {
         case 'steps':
-          out = `⚠️ ${stepsPrompt(text)}`
+          out = stepsPrompt(text)
           break
         case 'version':
-          out = `⚠️ ${versionPrompt(text)}`
+          out = versionPrompt(text)
           break
         case 'feedbackType':
-          out = `⚠️ ${feedbackTypePrompt(text)}`
+          out = feedbackTypePrompt(text)
           break
         default:
-          out = `Consider providing more detail about: "${text}"`
+          out = `Improve: "${text}"`
       }
       if (logIO) {
         console.log('[LLM] field:', field, 'input:', text, 'output:', out)
