@@ -13,7 +13,7 @@ This document tracks implementation tasks, features, and enhancements.
 
  - [x] Create synthetic bug report dataset (complete vs incomplete)
 - [ ] Train TF.js / ONNX model for predictive validation
-- [ ] Add live prediction on field blur or debounce
+- [x] Add live prediction on field blur or debounce
 
 ## 💬 Gen AI Integration
 
@@ -22,7 +22,7 @@ This document tracks implementation tasks, features, and enhancements.
   - Vague “Steps to Reproduce”
   - Invalid or missing version number
   - Unclassified feedback type
-- [ ] Disable LLM if memory is below threshold
+- [x] Disable LLM if memory is below threshold
 - [ ] Create reusable prompt templates
 
 ## 🧩 Agent System
@@ -35,7 +35,7 @@ This document tracks implementation tasks, features, and enhancements.
 
 ## 🧪 Testing
 
-- [ ] Add test mode with mock predictions
+- [x] Add test mode with mock predictions
 - [ ] Memory limit simulation mode
 - [ ] Verify fallback to static rules on low-end devices
 

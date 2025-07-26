@@ -20,11 +20,14 @@ export function useFieldExplainer(enabled = true) {
     if (enabled && hasEnoughMemory() && !llm && !loading.current) {
       loading.current = true
       loadLLM().then((m) => setLLM(m))
+    } else if ((!enabled || !hasEnoughMemory()) && llm) {
+      setLLM(null)
+      loading.current = false
     }
   }, [enabled, llm])
 
   return async (value: string) => {
-    if (!llm) return null
+    if (!llm || !hasEnoughMemory()) return null
     if (value.trim().length < 10) {
       return llm.explain(value)
     }
