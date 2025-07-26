@@ -16,17 +16,17 @@ interface FormValues {
 }
 
 // Description of the form for the assistant
-const FORM_DESCRIPTION = 'Bug report submission form for the FormBuddy demo application.'
+const FORM_DESCRIPTION = 'Bug report submission form for an application. It collects user feedback on bugs, features, and UI issues.'
 
 // Define the fields and their descriptions
 const FIELDS: FieldDetail[] = [
-  { name: 'fullName', description: 'Your full name' },
-  { name: 'email', description: 'Contact email address' },
+  { name: 'fullName', description: 'full name' },
+  { name: 'email', description: 'contact email address' },
   { name: 'feedbackType', description: 'Bug, Feature or UI Issue' },
-  { name: 'version', description: 'Application version number' },
-  { name: 'steps', description: 'Steps to reproduce the problem' },
-  { name: 'expected', description: 'Expected behaviour of the application' },
-  { name: 'actual', description: 'Actual behaviour observed' },
+  { name: 'version', description: 'application version number' },
+  { name: 'steps', description: 'steps to reproduce the problem' },
+  { name: 'expected', description: 'expected behaviour of the application' },
+  { name: 'actual', description: 'actual behaviour observed' },
 ]
 
 // Generate more detailed prompts based on the detected error type
