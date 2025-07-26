@@ -32,6 +32,9 @@ npm run dev
 
 Open `http://localhost:5173` to try it out.
 
+The service worker is only registered in production builds. Run `npm run build`
+followed by `npm run preview` to test offline support.
+
 ### Training the ML model
 
 The repository includes a small Python script that trains a text
