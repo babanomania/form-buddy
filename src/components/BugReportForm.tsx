@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from '@mui/material'
 import { usePredictiveValidation } from '../hooks/usePredictiveValidation'
 import { useFieldExplainer } from '../hooks/useFieldExplainer'
 import {
@@ -121,138 +131,137 @@ export function BugReportForm() {
   const { ref: actualRegRef, ...actualRest } = register('actual', { required: true })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label>Full Name</label>
-        <input
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Stack spacing={2}>
+        <TextField
+          label="Full Name"
           {...fullNameRest}
-          ref={(el) => {
+          inputRef={(el) => {
             fullNameRef.current = el
             fullNameRegRef(el)
           }}
+          error={!!errors.fullName}
+          helperText={
+            checking.fullName
+              ? 'Checking...'
+              : errors.fullName
+                ? 'Required'
+                : hints.fullName || ' '
+          }
         />
-        {errors.fullName && <span>Required</span>}
-        {checking.fullName ? (
-          <small>Checking...</small>
-        ) : (
-          hints.fullName && <small>{hints.fullName}</small>
-        )}
-      </div>
 
-      <div>
-        <label>Email</label>
-        <input
-          {...emailRest}
+        <TextField
+          label="Email"
           type="email"
-          ref={(el) => {
+          {...emailRest}
+          inputRef={(el) => {
             emailRef.current = el
             emailRegRef(el)
           }}
+          error={!!errors.email}
+          helperText={
+            checking.email ? 'Checking...' : errors.email ? 'Required' : hints.email || ' '
+          }
         />
-        {errors.email && <span>Required</span>}
-        {checking.email ? (
-          <small>Checking...</small>
-        ) : (
-          hints.email && <small>{hints.email}</small>
-        )}
-      </div>
 
-      <div>
-        <label>Feedback Type</label>
-        <select
-          {...feedbackRest}
-          ref={(el) => {
-            feedbackTypeRef.current = el
-            feedbackRegRef(el)
-          }}
-        >
-          <option value="Bug">Bug</option>
-          <option value="Feature">Feature</option>
-          <option value="UI Issue">UI Issue</option>
-        </select>
-        {errors.feedbackType && <span>Required</span>}
-        {checking.feedbackType ? (
-          <small>Checking...</small>
-        ) : (
-          hints.feedbackType && <small>{hints.feedbackType}</small>
-        )}
-      </div>
+        <FormControl fullWidth error={!!errors.feedbackType}>
+          <InputLabel id="feedback-type-label">Feedback Type</InputLabel>
+          <Select
+            labelId="feedback-type-label"
+            label="Feedback Type"
+            {...feedbackRest}
+            inputRef={(el) => {
+              feedbackTypeRef.current = el
+              feedbackRegRef(el)
+            }}
+          >
+            <MenuItem value="Bug">Bug</MenuItem>
+            <MenuItem value="Feature">Feature</MenuItem>
+            <MenuItem value="UI Issue">UI Issue</MenuItem>
+          </Select>
+          {errors.feedbackType || hints.feedbackType ? (
+            <small>
+              {checking.feedbackType
+                ? 'Checking...'
+                : errors.feedbackType
+                  ? 'Required'
+                  : hints.feedbackType}
+            </small>
+          ) : null}
+        </FormControl>
 
-      <div>
-        <label>App Version</label>
-        <input
+        <TextField
+          label="App Version"
           {...versionRest}
-          ref={(el) => {
+          inputRef={(el) => {
             versionRef.current = el
             versionRegRef(el)
           }}
+          error={!!errors.version}
+          helperText={
+            checking.version ? 'Checking...' : errors.version ? 'Required' : hints.version || ' '
+          }
         />
-        {errors.version && <span>Required</span>}
-        {checking.version ? (
-          <small>Checking...</small>
-        ) : (
-          hints.version && <small>{hints.version}</small>
-        )}
-      </div>
 
-      <div>
-        <label>Steps to Reproduce</label>
-        <textarea
+        <TextField
+          label="Steps to Reproduce"
+          multiline
+          minRows={3}
           {...stepsRest}
-          ref={(el) => {
+          inputRef={(el) => {
             stepsRef.current = el
             stepsRegRef(el)
           }}
+          error={!!errors.steps}
+          helperText={
+            checking.steps ? 'Checking...' : errors.steps ? 'Required' : hints.steps || ' '
+          }
         />
-        {errors.steps && <span>Required</span>}
-        {checking.steps ? (
-          <small>Checking...</small>
-        ) : (
-          hints.steps && <small>{hints.steps}</small>
-        )}
-      </div>
 
-      <div>
-        <label>Expected Behavior</label>
-        <textarea
+        <TextField
+          label="Expected Behavior"
+          multiline
+          minRows={2}
           {...expectedRest}
-          ref={(el) => {
+          inputRef={(el) => {
             expectedRef.current = el
             expectedRegRef(el)
           }}
+          error={!!errors.expected}
+          helperText={
+            checking.expected
+              ? 'Checking...'
+              : errors.expected
+                ? 'Required'
+                : hints.expected || ' '
+          }
         />
-        {errors.expected && <span>Required</span>}
-        {checking.expected ? (
-          <small>Checking...</small>
-        ) : (
-          hints.expected && <small>{hints.expected}</small>
-        )}
-      </div>
 
-      <div>
-        <label>Actual Behavior</label>
-        <textarea
+        <TextField
+          label="Actual Behavior"
+          multiline
+          minRows={2}
           {...actualRest}
-          ref={(el) => {
+          inputRef={(el) => {
             actualRef.current = el
             actualRegRef(el)
           }}
+          error={!!errors.actual}
+          helperText={
+            checking.actual ? 'Checking...' : errors.actual ? 'Required' : hints.actual || ' '
+          }
         />
-        {errors.actual && <span>Required</span>}
-        {checking.actual ? (
-          <small>Checking...</small>
-        ) : (
-          hints.actual && <small>{hints.actual}</small>
-        )}
-      </div>
 
-      <div>
-        <label>Screenshot (optional)</label>
-        <input type="file" {...register('screenshot')} />
-      </div>
+        <Button variant="outlined" component="label">
+          Upload Screenshot
+          <input type="file" hidden {...register('screenshot')} />
+        </Button>
 
-      <button type="submit">Submit</button>
-    </form>
+        <Button type="submit" variant="contained">
+          Submit
+        </Button>
+      </Stack>
+    </Box>
   )
 }
 export default BugReportForm
