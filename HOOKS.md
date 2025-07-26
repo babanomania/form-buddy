@@ -4,6 +4,8 @@ This project provides small React hooks used by the agent system.
 
 ## `usePredictiveValidation`
 Loads a lightweight ML model and returns an async function that scores a field's value. If the model is not loaded yet, the function resolves to `null`.
+Set `VITE_LOG_MODEL_IO=true` to log model inputs and outputs for debugging.
 
 ## `useFieldExplainer`
 Loads a browser friendly LLM and returns an async function that can provide a short explanation for vague input. The hook checks memory limits before loading the model. Set `VITE_LOW_MEMORY=true` to simulate a low-memory environment during development.
+`VITE_LOG_MODEL_IO=true` will also log explanation prompts and responses.
