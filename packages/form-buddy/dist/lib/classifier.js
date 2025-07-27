@@ -1,6 +1,15 @@
 import * as ort from 'onnxruntime-web';
 // ESM import only. Do not set wasmPaths or use UMD build.
 const logIO = process.env?.REACT_APP_LOG_MODEL_IO === 'true';
+function preprocess(field, value) {
+    let v = value;
+    if (v === '')
+        v = '<EMPTY>';
+    if (field === 'fullName' && /\d/.test(v)) {
+        v += ' <HAS_DIGIT>';
+    }
+    return v;
+}
 export async function loadModel(name, errorTypes) {
     const orderedTypes = [...errorTypes].sort();
     const response = await fetch(`/models/${name}`);
@@ -9,9 +18,10 @@ export async function loadModel(name, errorTypes) {
     return {
         modelName: name,
         async predict(field, value) {
+            const preValue = preprocess(field, value);
             const feeds = {
                 field: new ort.Tensor('string', [field], [1, 1]),
-                value: new ort.Tensor('string', [value], [1, 1]),
+                value: new ort.Tensor('string', [preValue], [1, 1]),
             };
             const results = await session.run(feeds);
             const label = results.label.data[0];

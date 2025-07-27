@@ -4,13 +4,23 @@ import { logger } from './logger.js';
 // Simple in-memory cache for ONNX sessions by model name
 const modelSessionCache = new Map();
 
+function preprocess(field, value) {
+  let v = value;
+  if (v === '') v = '<EMPTY>';
+  if (field === 'fullName' && /\d/.test(v)) {
+    v += ' <HAS_DIGIT>';
+  }
+  return v;
+}
+
 function makePredict(session, orderedTypes) {
   return async function predict(field, value) {
 
     logger('predict called', { field, value });
+    const preValue = preprocess(field, value);
     const feeds = {
       field: new ort.Tensor('string', [field], [1, 1]),
-      value: new ort.Tensor('string', [value], [1, 1]),
+      value: new ort.Tensor('string', [preValue], [1, 1]),
     };
 
     const results = await session.run(feeds);
