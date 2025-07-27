@@ -7,7 +7,7 @@ Powered by a hybrid of in-browser machine learning and generative AI, FormBuddy 
 - Explains vague or incomplete inputs
 - Guides users to submit clear, actionable data
 
-(Old) Static Errors        |  (New) Dynamic Errors
+ Static Errors             |  FormBuddy Errors
 :-------------------------:|:-------------------------:
 ![](old_error.png)         |  ![](new_error.png)
 
@@ -20,11 +20,11 @@ FormBuddy enhances [React Hook Form](https://react-hook-form.com/) by adding:
 
 * **Predictive Validation** — A lightweight ML model (via TensorFlow\.js or ONNX.js) flags missing or invalid fields *before* traditional validation kicks in.
 * **Field-Level Explanations** — A small LLM (like TinyLlama or Qwen3-1.7B) offers concise, human-like feedback using WebLLM.
-* **Memory Awareness** — When memory is tight, FormBuddy gracefully disables LLM features and falls back to static hints (`VITE_LOW_MEMORY=true`).
+* **Memory Awareness** — When memory is tight, FormBuddy gracefully disables LLM features and falls back to static hints (`REACT_APP_LOW_MEMORY=true`).
 * **Composable Design** — Built directly on React Hook Form, FormBuddy works as a hook (`useFormBuddy`) and can be integrated without changing your existing form code.
 * **Customizable Prompts** — You control how prompts are constructed using field-specific templates.
 * **Zero Network Calls** — All inference happens inside the browser. No servers, no tokens, no privacy leaks.
-* **Debug Logging** — Enable `VITE_LOG_MODEL_IO=true` to log what your ML and LLM models are thinking.
+* **Debug Logging** — Enable `REACT_APP_LOG_MODEL_IO=true` to log what your ML and LLM models are thinking.
 
 FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome with an ML sidekick.
 
@@ -34,7 +34,7 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
 
    ```ts
    const FORM_DESCRIPTION = 'Bug report submission form for an application. It collects user feedback on bugs, features, and UI issues.'
-   const FIELDS: FieldDetail[] = [
+   const FIELDS = [
       { name: 'fullName', description: 'full name' },
       { name: 'email', description: 'contact email address' },
       { name: 'feedbackType', description: 'Bug, Feature or UI Issue' },
@@ -76,11 +76,7 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
 4. **Define system prompts.** Prompts are generated dynamically based on form description, field description and the ML error type. The example application defines a helper:
 
    ```ts
-   const getPrompt = (
-      form: string,
-      field: string,
-      error: string,
-    ) => {
+   const getPrompt = (form, field, error) => {
       const base = `You are assisting with the "${form}" form.`
       switch (error) {
         case 'missing':
@@ -164,12 +160,6 @@ pip install -r requirements.txt
 
 ```bash
 python train_model.py
-```
-
-5. Copy ONNX Runtime's WebAssembly assets so the demo can load them:
-
-```bash
-cp node_modules/onnxruntime-web/dist/ort-wasm* packages/example/public/wasm/
 ```
 
 ## Testing

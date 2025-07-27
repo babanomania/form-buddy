@@ -2,9 +2,10 @@
   "name": "form-buddy",
   "version": "0.1.0",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.js"
   },
   "dependencies": {
     "react": "^19.1.0",
