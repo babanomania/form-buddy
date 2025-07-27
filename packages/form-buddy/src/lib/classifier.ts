@@ -1,65 +1,93 @@
-const logIO = import.meta.env.VITE_LOG_MODEL_IO === 'true'
+const logIO = import.meta.env.VITE_LOG_MODEL_IO === "true";
 
 export interface Prediction {
-  score: number
-  type: string
+  score: number;
+  type: string;
 }
 
-const defaultModelName = 'bug_report_classifier.onnx'
+const defaultModelName = "bug_report_classifier.onnx";
 
 export async function loadModel(
   name: string = defaultModelName,
-  errorTypes: string[] = ['missing', 'too short', 'vague', 'ok'],
+  errorTypes: string[] = ["missing", "too short", "vague", "ok"],
 ) {
   // Ensure consistent ordering of labels used by the model
-  const orderedTypes = [...errorTypes].sort()
+  const orderedTypes = [...errorTypes].sort();
   // Use a predictable mock when running in test mode
-  if (import.meta.env.VITE_TEST_MODE === 'true') {
+  if (import.meta.env.VITE_TEST_MODE === "true") {
     return {
       modelName: name,
-      predict: (value: string): Prediction => {
-        void value
-        const result = { score: 0.9, type: orderedTypes[0] || 'incomplete' } as Prediction
+      predict: (field: string, value: string): Prediction => {
+        void field;
+        void value;
+        const result = {
+          score: 0.9,
+          type: orderedTypes[0] || "incomplete",
+        } as Prediction;
         if (logIO) {
-          console.log('[ML] input:', value, 'score:', result.score, 'type:', result.type)
+          console.log(
+            "[ML] field:",
+            field,
+            "value:",
+            value,
+            "score:",
+            result.score,
+            "type:",
+            result.type,
+          );
         }
-        return result
+        return result;
       },
-    }
+    };
   }
 
   // Placeholder: In a real app, you would load a TF.js model from /public/models
-  await new Promise((resolve) => setTimeout(resolve, 100))
-  const vagueRegex = /(not sure|something broke|can't explain|idk|unsure)/i
-  const invalidRegex = /^v?\d(\.\d)?$|^ver\d+$/i
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const vagueRegex = /(not sure|something broke|can't explain|idk|unsure)/i;
+  const invalidRegex = /^v?\d(\.\d)?$|^ver\d+$/i;
   return {
     modelName: name,
-    predict: (input: string): Prediction => {
-      const trimmed = input.trim()
-      let score: number
-      let type: string = orderedTypes[orderedTypes.length - 1] || 'ok'
+    predict: (field: string, input: string): Prediction => {
+      const trimmed = input.trim();
+      let score: number;
+      let type: string = orderedTypes[orderedTypes.length - 1] || "ok";
 
       if (!trimmed && orderedTypes[0]) {
-        score = 0.9
-        type = orderedTypes[0]
-      } else if (invalidRegex.test(trimmed) && orderedTypes.includes('invalid')) {
-        score = 0.85
-        type = 'invalid'
+        score = 0.9;
+        type = orderedTypes[0];
+      } else if (
+        invalidRegex.test(trimmed) &&
+        orderedTypes.includes("invalid")
+      ) {
+        score = 0.85;
+        type = "invalid";
       } else if (trimmed.length < 8 && orderedTypes[1]) {
-        score = 0.8
-        type = orderedTypes[1]
-      } else if ((vagueRegex.test(trimmed) || trimmed.split(/\s+/).length <= 3) && orderedTypes.includes('vague')) {
-        score = 0.7
-        type = 'vague'
+        score = 0.8;
+        type = orderedTypes[1];
+      } else if (
+        (vagueRegex.test(trimmed) || trimmed.split(/\s+/).length <= 3) &&
+        orderedTypes.includes("vague")
+      ) {
+        score = 0.7;
+        type = "vague";
       } else {
-        score = 0.2
+        score = 0.2;
       }
 
       if (logIO) {
-        console.log('[ML] input:', input, 'score:', score, 'type:', type)
+        console.log(
+          "[ML] field:",
+          field,
+          "value:",
+          input,
+          "score:",
+          score,
+          "type:",
+          type,
+        );
       }
-      return { score, type }
+      return { score, type };
     },
-  }
+  };
 }
-export type Model = Awaited<ReturnType<typeof loadModel>>
+export type Model = Awaited<ReturnType<typeof loadModel>>;

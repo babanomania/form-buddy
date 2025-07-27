@@ -1,4 +1,3 @@
-import sys
 import importlib.util
 from pathlib import Path
 
@@ -30,12 +29,18 @@ def test_model_predictions():
 
     # generate dataset and train model in-memory
     gen.main()
-    texts, labels = trainer.load_data()
-    model = trainer.train_model(texts, labels)
+    records, labels = trainer.load_data()
+    model = trainer.train_model(records, labels)
 
     # verify classifier identifies vague or invalid inputs
-    pred_vague = model.predict(["stepsToReproduce: can't explain"])[0]
-    pred_invalid = model.predict(["appVersion: ver42"])[0]
+    import pandas as pd
+
+    pred_vague = model.predict(
+        pd.DataFrame([{"field": "stepsToReproduce", "value": "can't explain"}])
+    )[0]
+    pred_invalid = model.predict(
+        pd.DataFrame([{"field": "appVersion", "value": "ver42"}])
+    )[0]
 
     assert pred_vague == "vague"
     assert pred_invalid == "invalid"
