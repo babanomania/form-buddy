@@ -178,6 +178,12 @@ pip install -r requirements.txt
 python train_model.py
 ```
 
+5. Test the generated model
+
+```bash
+pytest -vv
+```
+
 ## Downloading the LLM Model (WebLLM)
 
 FormBuddy uses a small, quantized open-source language model (like `Qwen3-1.7B-q4f32_1-MLC`) to generate helpful suggestions. All inference happens locally using [WebLLM](https://github.com/mlc-ai/web-llm), so the model needs to be downloaded before first use.
@@ -189,13 +195,17 @@ We provide a script to download the model directly from Hugging Face into the co
 1. From the project root, run the following:
 
    ```bash
+    cd training
+    . venv/bin/activate
+   ```
+
+   ```bash
    pip install huggingface_hub
    ```
 
 2. Then execute the script:
 
    ```bash
-   cd training
    python download_llm_model.py
    ```
 
@@ -245,6 +255,8 @@ This repo uses **npm workspaces**.
 ---
 - `training/generate_synthetic_data.py` – script to generate synthetic bug report data for training
 - `training/train_model.py` – script to train the bug report classifier and export ONNX model
+- `training/download_llm_model.py` – script to download the llm model
+- `training/test/test_model.py` – Python test script to verify the generated model
 - `training/requirements.txt` – Python dependencies for training scripts
 
 ## License
