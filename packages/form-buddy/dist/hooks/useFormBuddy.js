@@ -55,7 +55,7 @@ export function useFormBuddy(formDescription, fields, getSystemPrompt, options =
         const prediction = await modelRef.current.predict(name, value);
         if (logIO)
             console.log(`[ML] Field "${name}" prediction:`, prediction);
-        if (prediction.score > threshold) {
+        if (prediction.score > threshold && prediction.type !== 'ok') {
             if (logIO)
                 console.log(`[ML] Field "${name}" prediction above threshold:`, prediction);
             const fieldDesc = fieldMap.current[name] || "";

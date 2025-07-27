@@ -99,7 +99,7 @@ export function useFormBuddy(
     const prediction = await modelRef.current.predict(name, value);
     logger(`Prediction for field ${name}:`, prediction);
 
-    if (prediction.score > threshold) {
+    if (prediction.score > threshold && prediction.type !== 'ok') {
       const fieldDesc = fieldMap.current[name] || "";
       const text = `${value}\n\nForm: ${formDescription}\nField: ${fieldDesc}`;
       const systemPrompt = getSystemPrompt(formDescription, fieldDesc, prediction.type);
