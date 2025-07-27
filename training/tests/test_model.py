@@ -32,19 +32,35 @@ def test_model_predictions():
     records, labels = trainer.load_data()
     model = trainer.train_model(records, labels)
 
-    # verify classifier identifies vague or invalid inputs
-    import pandas as pd
+    # export and load ONNX model for inference
+    trainer.MODEL_PATH = TRAIN_DIR / "test_model.onnx"
+    trainer.export_onnx(model)
 
-    pred_vague = model.predict(
-        pd.DataFrame([{"field": "stepsToReproduce", "value": "can't explain"}])
-    )[0]
-    pred_invalid = model.predict(
-        pd.DataFrame([{"field": "appVersion", "value": "ver42"}])
-    )[0]
+    import numpy as np
+    import onnxruntime as ort
+
+    sess = ort.InferenceSession(str(trainer.MODEL_PATH))
+
+    pred_vague = sess.run(
+        None,
+        {
+            "field": np.array([["stepsToReproduce"]], dtype=object),
+            "value": np.array([["can't explain"]], dtype=object),
+        },
+    )[0][0]
+
+    pred_invalid = sess.run(
+        None,
+        {
+            "field": np.array([["appVersion"]], dtype=object),
+            "value": np.array([["ver42"]], dtype=object),
+        },
+    )[0][0]
 
     assert pred_vague == "vague"
     assert pred_invalid == "invalid"
 
     # cleanup generated files
     DATA_PATH.unlink(missing_ok=True)
+    trainer.MODEL_PATH.unlink(missing_ok=True)
 

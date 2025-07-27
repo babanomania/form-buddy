@@ -10,6 +10,7 @@
     "react": "^19.1.0",
     "react-hook-form": "^7.50.0",
     "@mlc-ai/web-llm": "^0.2.79",
-    "@tensorflow/tfjs": "^4.16.0"
+    "@tensorflow/tfjs": "^4.16.0",
+    "onnxruntime-web": "^1.22.0"
   }
 }

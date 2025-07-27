@@ -5,3 +5,4 @@ packaging
 Faker
 pandas
 pytest
+onnxruntime
