@@ -171,7 +171,7 @@ def main() -> None:
     output_path = Path("bug_reports_data.json")
     output_path.write_text(json.dumps(reports, indent=2))
     print(f"Wrote {len(reports)} reports to {output_path}")
-    print("Sample:", reports[:5])
+    # print("Sample:", reports[:1])
 
 
 if __name__ == "__main__":
