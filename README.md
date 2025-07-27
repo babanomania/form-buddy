@@ -244,12 +244,12 @@ confirm the classifier behaves the same as the Python tests.
 
 This repo uses **npm workspaces**.
 
-- `packages/form-buddy` – reusable hooks and agents
+- `packages/form-buddy` – main form-buddy library
 - `packages/form-buddy/src/useFormBuddy.js` – main helper hook
-- `packages/form-buddy/src/lib/classifier.js` – placeholder ML implementation
-- `packages/form-buddy/src/lib/llm.js` – mock LLM client
+- `packages/form-buddy/src/lib/classifier.js` – ML client
+- `packages/form-buddy/src/lib/llm.js` – LLM client
 ---
-- `packages/example` – demo application
+- `packages/example` – example application
 - `packages/example/src/components/BugReportForm.js` – example form component
 - `packages/example/public/models` – place to store local model files
 ---
