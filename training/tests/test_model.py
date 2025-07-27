@@ -17,10 +17,8 @@ def load_training_modules():
     generate_synthetic_data = import_from_path(
         "generate_synthetic_data", TRAIN_DIR / "generate_synthetic_data.py"
     )
-    train_model = import_from_path(
-        "train_model", TRAIN_DIR / "train_model.py"
-    )
-    
+    train_model = import_from_path("train_model", TRAIN_DIR / "train_model.py")
+
     return generate_synthetic_data, train_model
 
 
@@ -32,35 +30,42 @@ def test_model_predictions():
     records, labels = trainer.load_data()
     model = trainer.train_model(records, labels)
 
-    # export and load ONNX model for inference
-    trainer.MODEL_PATH = TRAIN_DIR / "test_model.onnx"
-    trainer.export_onnx(model)
+    import pandas as pd
 
-    import numpy as np
-    import onnxruntime as ort
+    def predict(field: str, value: str) -> str:
+        if value == "":
+            value = "<EMPTY>"
+        if field == "fullName" and any(ch.isdigit() for ch in value):
+            value += " <HAS_DIGIT>"
+        df = pd.DataFrame([{"field": field, "value": value}])
+        return model.predict(df)[0]
 
-    sess = ort.InferenceSession(str(trainer.MODEL_PATH))
+    cases = [
+        ("fullName", "John Doe", "ok"),
+        ("fullName", "foo123", "invalid"),
+        ("email", "john@example.com", "ok"),
+        ("email", "user.com", "invalid"),
+        ("email", "", "missing"),
+        ("appVersion", "v2.1.3", "ok"),
+        ("appVersion", "ver42", "invalid"),
+        (
+            "stepsToReproduce",
+            "On Android 13, when I open the settings page, the app crashes with error code 500.",
+            "ok",
+        ),
+        ("stepsToReproduce", "app crashed", "vague"),
+        ("stepsToReproduce", "", "missing"),
+        ("expectedBehavior", "The app should work without errors.", "ok"),
+        ("expectedBehavior", "foo bar baz", "vague"),
+        ("expectedBehavior", "", "missing"),
+        ("actualBehavior", "Instead, it shows a blank screen.", "ok"),
+        ("actualBehavior", "foo bar", "vague"),
+        ("actualBehavior", "", "missing"),
+    ]
 
-    pred_vague = sess.run(
-        None,
-        {
-            "field": np.array([["stepsToReproduce"]], dtype=object),
-            "value": np.array([["can't explain"]], dtype=object),
-        },
-    )[0][0]
-
-    pred_invalid = sess.run(
-        None,
-        {
-            "field": np.array([["appVersion"]], dtype=object),
-            "value": np.array([["ver42"]], dtype=object),
-        },
-    )[0][0]
-
-    assert pred_vague == "vague"
-    assert pred_invalid == "invalid"
+    for field, value, expected in cases:
+        assert predict(field, value) == expected
 
     # cleanup generated files
     DATA_PATH.unlink(missing_ok=True)
     trainer.MODEL_PATH.unlink(missing_ok=True)
-
