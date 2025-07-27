@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from '@mui/material'
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { useFormBuddy, defaultPromptGenerator } from 'form-buddy'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -65,6 +65,38 @@ const getStaticMessage = (error, field) => {
     default:
       return `Check the ${field} field.`
   }
+}
+
+function SmartFormInfo() {
+  return (
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Smart Form
+      </Typography>
+      <Typography paragraph>
+        This form combines traditional validation with ML-powered hints.
+      </Typography>
+      <Typography variant="subtitle1">Static validation rules</Typography>
+      <ul>
+        <li>Full Name: required</li>
+        <li>Email: must be a valid email address</li>
+        <li>Feedback Type: choose Bug, Feature or UI Issue</li>
+        <li>App Version: pattern <code>1.0.0</code></li>
+        <li>Steps to Reproduce: at least 10 characters</li>
+        <li>Expected Behavior: required</li>
+        <li>Actual Behavior: required</li>
+      </ul>
+      <Typography variant="subtitle1">Dynamic rules (ML)</Typography>
+      <ul>
+        <li>Full Name flagged if it does not resemble a real name.</li>
+        <li>Email flagged when it looks like <code>word.com</code>.</li>
+        <li>App Version should follow <code>v1.2.3</code> or <code>v0.0.1-beta</code>; values like "v1" or "1.0" are invalid.</li>
+        <li>Steps must be a sentence like "On device, when I action, the app issue." Short phrases are vague.</li>
+        <li>Expected Behavior should read "The app should X without errors."</li>
+        <li>Actual Behavior should start "Instead, it ..." describing the issue.</li>
+      </ul>
+    </Box>
+  )
 }
 
 function InnerForm() {
@@ -219,9 +251,16 @@ export function BugReportForm() {
   })
 
   return (
-    <FormProvider {...methods}>
-      <InnerForm />
-    </FormProvider>
+    <Box display="flex" gap={4} alignItems="flex-start">
+      <Box flex={1}>
+        <FormProvider {...methods}>
+          <InnerForm />
+        </FormProvider>
+      </Box>
+      <Box flex={1}>
+        <SmartFormInfo />
+      </Box>
+    </Box>
   )
 }
 
