@@ -189,6 +189,16 @@ npm --workspace packages/example run start
 
 Open `http://localhost:5173` to try it out.
 
+To verify the ONNX model directly in the browser, open your developer tools and
+run:
+
+```js
+await runModelTests()
+```
+
+Each predefined case will print `✅` or `❌` along with a summary so you can
+confirm the classifier behaves the same as the Python tests.
+
 ## Project Structure
 
 This repo uses **npm workspaces**.
