@@ -20,6 +20,7 @@ export function useFormBuddy(
     llmModelName: llmName,
     threshold = 0.7,
     errorTypes,
+    errorMessageGenerator,
   } = options;
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState({});
@@ -29,32 +30,48 @@ export function useFormBuddy(
   const llmRef = useRef(null);
   const cache = useRef(new Map());
   const fieldMap = useRef(Object.fromEntries(fields.map((f) => [f.name, f.description])));
+  const MEMORY_LIMIT = 100 * 1024 * 1024; // 100MB
+  const lowMemory = (() => {
+    if (process.env.REACT_APP_LOW_MEMORY !== 'true') return false;
+    const perf = typeof performance !== 'undefined' ? performance : null;
+    if (!perf || !perf.memory) return true;
+    const free = perf.memory.jsHeapSizeLimit - perf.memory.usedJSHeapSize;
+    return free < MEMORY_LIMIT;
+  })();
 
   useEffect(() => {
     let canceled = false;
     logger('Loading model and LLM...');
 
-    Promise.all([
-      loadModel(validationModelName, errorTypes),
-      loadLLM(llmName),
+    async function load() {
+      const model = await loadModel(validationModelName, errorTypes);
+      if (canceled) return;
+      modelRef.current = model;
+      setMLModelName(model.modelName);
 
-    ]).then(([model, llm]) => {
-      if (!canceled) {
-        modelRef.current = model;
-        llmRef.current = llm;
-        setMLModelName(model.modelName);
-        setLLMModelName(llm.modelName);
+      if (lowMemory) {
+        logger('Low memory mode enabled, skipping WebLLM');
+        llmRef.current = { explain: async () => null, modelName: 'static' };
+        setLLMModelName('static');
         setLoading(false);
-        logger('Models loaded', { model, llm });
-
+        return;
       }
-    });
+
+      const llm = await loadLLM(llmName);
+      if (canceled) return;
+      llmRef.current = llm;
+      setLLMModelName(llm.modelName);
+      setLoading(false);
+      logger('Models loaded', { model, llm });
+    }
+
+    load();
 
     return () => {
       canceled = true;
     };
 
-  }, [validationModelName, llmName, errorTypes]);
+  }, [validationModelName, llmName, errorTypes, lowMemory]);
 
   const handleBlur = async (name, value) => {
 
@@ -70,7 +87,7 @@ export function useFormBuddy(
       return;
     }
 
-    if (!modelRef.current || !llmRef.current) {
+    if (!modelRef.current || (!lowMemory && !llmRef.current)) {
       loggerError('Model or LLM not loaded');
       return;
     }
@@ -82,15 +99,23 @@ export function useFormBuddy(
       const fieldDesc = fieldMap.current[name] || "";
       const text = `${value}\n\nForm: ${formDescription}\nField: ${fieldDesc}`;
       const systemPrompt = getSystemPrompt(formDescription, fieldDesc, prediction.type);
-      const prompt = `${text}${prediction.type ? `\n\nReason: ${prediction.type}` : ""}`;
-      logger('Prompt for LLM:', prompt);
 
-      const message = await llmRef.current.explain(prompt, systemPrompt);
-      logger('LLM message:', message);
-      
-      if (message) {
+      if (lowMemory) {
+        const message = errorMessageGenerator
+          ? errorMessageGenerator(prediction.type, fieldDesc)
+          : `Please review the "${fieldDesc}" field.`;
         cache.current.set(key, message);
         setError(name, { type: "formbuddy", message });
+      } else {
+        const prompt = `${text}${prediction.type ? `\n\nReason: ${prediction.type}` : ""}`;
+        logger('Prompt for LLM:', prompt);
+        const message = await llmRef.current.explain(prompt, systemPrompt);
+        logger('LLM message:', message);
+
+        if (message) {
+          cache.current.set(key, message);
+          setError(name, { type: "formbuddy", message });
+        }
       }
     }
 

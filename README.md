@@ -20,7 +20,7 @@ FormBuddy enhances [React Hook Form](https://react-hook-form.com/) by adding:
 
 * **Predictive Validation** — A lightweight ML model (via TensorFlow\.js or ONNX.js) flags missing or invalid fields *before* traditional validation kicks in.
 * **Field-Level Explanations** — A small LLM (like TinyLlama or Qwen3-1.7B) offers concise, human-like feedback using WebLLM.
-* **Memory Awareness** — When memory is tight, FormBuddy gracefully disables LLM features and falls back to static hints (`REACT_APP_LOW_MEMORY=true`).
+* **Memory Awareness** — When memory is tight, FormBuddy disables WebLLM and uses static messages when `REACT_APP_LOW_MEMORY=true` and the browser has less than 100MB of free JS heap.
 * **Composable Design** — Built directly on React Hook Form, FormBuddy works as a hook (`useFormBuddy`) and can be integrated without changing your existing form code.
 * **Customizable Prompts** — You control how prompts are constructed using field-specific templates.
 * **Zero Network Calls** — All inference happens inside the browser. No servers, no tokens, no privacy leaks.
@@ -91,6 +91,21 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
     }
    ```
 
+   ```ts
+   const getStaticMessage = (error, field) => {
+     switch (error) {
+       case 'missing':
+         return `Please provide the ${field} field.`
+       case 'invalid':
+         return `The value for ${field} appears invalid.`
+       case 'vague':
+         return `The input for ${field} is unclear.`
+       default:
+         return `Check the ${field} field.`
+     }
+   }
+   ```
+
 
 5. **Use the hook.** Call `useFormBuddy` inside your form component:
 
@@ -98,7 +113,8 @@ FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome 
    const { handleBlur, loading, checking  } = useFormBuddy(FORM_DESCRIPTION, FIELDS, getPrompt, {
      validationModelName: 'bug_report_classifier.onnx',
      llmModelName: 'Qwen3-1.7B-q4f32_1-MLC',
-     errorTypes: ['invalid', 'missing', 'vague', 'ok']
+     errorTypes: ['invalid', 'missing', 'vague', 'ok'],
+     errorMessageGenerator: getStaticMessage
    })
    ```
 
@@ -185,21 +201,14 @@ npm --workspace packages/example run preview
 
 ### Hook Signature
 
-```ts
-function useFormBuddy<T extends Record<string, any>>(
-  formDescription: string,
-  fields: FieldDetail[],
-  getPrompt: (form: string, field: string, error: string) => string,
-  options?: {
-    validationModelName?: string
-    llmModelName?: string
-    errorTypes?: string[]
-    threshold?: number
-  }
-): {
-  handleBlur: (field: keyof T, value: any) => Promise<void>
-  loading: boolean
-  checking: Record<keyof T, boolean>
+```js
+function useFormBuddy(
+  formDescription,
+  fields,
+  getPrompt,
+  options = {}
+) {
+  // returns { handleBlur, loading, checking }
 }
 ```
 
@@ -210,11 +219,11 @@ function useFormBuddy<T extends Record<string, any>>(
 
 - **fields** (`FieldDetail[]`):
   - An array of objects describing each form field.
-  - `FieldDetail` type:
-    ```ts
-    interface FieldDetail {
-      name: string // Field name (should match your form data keys)
-      description: string // Short description of the field's purpose
+  - `FieldDetail` structure:
+    ```js
+    {
+      name: 'fieldName',       // matches your form data keys
+      description: 'short description'
     }
     ```
 
@@ -226,18 +235,19 @@ function useFormBuddy<T extends Record<string, any>>(
   - `llmModelName` (`string`): Model ID for the LLM (e.g., TinyLlama, Qwen3-1.7B, etc).
   - `errorTypes` (`string[]`): List of error types the model can return (e.g., `['missing', 'invalid', 'vague', 'ok']`).
   - `threshold` (`number`): Confidence threshold for predictive validation (default: 0.5).
+  - `errorMessageGenerator` (`(error, field) => string`): Function used to create static messages when low memory mode is triggered. Low memory mode activates if `REACT_APP_LOW_MEMORY=true` and the browser reports less than 100MB of free JS heap.
 
-### Return Value
+-### Return Value
 
 The hook returns an object with the following properties:
 
-- **handleBlur** (`(field: keyof T, value: any) => Promise<void>`):
+- **handleBlur** (`(field: string, value: any) => Promise<void>`):
   - Call this in your field's `onBlur` handler to trigger predictive validation and LLM hint generation for that field.
 
 - **loading** (`boolean`):
   - `true` while the ML/LLM models are loading or initializing. Use to show a global loading indicator.
 
-- **checking** (`Record<keyof T, boolean>`):
+- **checking** (`Record<string, boolean>`):
   - An object mapping each field name to a boolean. `true` if that field is currently being checked by the ML/LLM pipeline (e.g., after `handleBlur`).
 
 ---
@@ -247,12 +257,12 @@ The hook returns an object with the following properties:
 This repo uses **npm workspaces**.
 
 - `packages/form-buddy` – reusable hooks and agents
-- `packages/form-buddy/src/hooks/useFormBuddy.ts` – main helper hook
-- `packages/form-buddy/src/lib/classifier.ts` – placeholder ML implementation
-- `packages/form-buddy/src/lib/llm.ts` – mock LLM client
+- `packages/form-buddy/src/useFormBuddy.js` – main helper hook
+- `packages/form-buddy/src/lib/classifier.js` – placeholder ML implementation
+- `packages/form-buddy/src/lib/llm.js` – mock LLM client
 ---
 - `packages/example` – demo application
-- `packages/example/src/components/BugReportForm.tsx` – example form component
+- `packages/example/src/components/BugReportForm.js` – example form component
 - `packages/example/public/models` – place to store local model files
 ---
 - `training/generate_synthetic_data.py` – script to generate synthetic bug report data for training

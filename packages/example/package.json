@@ -10,7 +10,8 @@
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.0",
     "@mui/material": "^7.2.0",
-    "form-buddy": "*"
+    "form-buddy": "*",
+    "yup": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

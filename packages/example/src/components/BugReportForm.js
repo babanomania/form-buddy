@@ -54,6 +54,19 @@ const schema = yup.object({
   screenshot: yup.mixed().nullable(),
 })
 
+const getStaticMessage = (error, field) => {
+  switch (error) {
+    case 'missing':
+      return `Please provide the ${field} field.`
+    case 'invalid':
+      return `The value for ${field} appears invalid.`
+    case 'vague':
+      return `The input for ${field} is unclear.`
+    default:
+      return `Check the ${field} field.`
+  }
+}
+
 function InnerForm() {
 
   const { register, handleSubmit, trigger, formState: { errors } } = useFormContext()
@@ -66,6 +79,7 @@ function InnerForm() {
       llmModelName: 'Qwen3-1.7B-q4f32_1-MLC',
       threshold: 0.7,
       errorTypes: ['invalid', 'missing', 'vague', 'ok'],
+      errorMessageGenerator: getStaticMessage,
     },
   )
 
