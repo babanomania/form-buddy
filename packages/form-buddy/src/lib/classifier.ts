@@ -9,7 +9,7 @@ const defaultModelName = 'bug_report_classifier.onnx'
 
 export async function loadModel(
   name: string = defaultModelName,
-  errorTypes: string[] = ['missing', 'too short', 'ok'],
+  errorTypes: string[] = ['missing', 'too short', 'vague', 'ok'],
 ) {
   // Ensure consistent ordering of labels used by the model
   const orderedTypes = [...errorTypes].sort()
@@ -30,21 +30,31 @@ export async function loadModel(
 
   // Placeholder: In a real app, you would load a TF.js model from /public/models
   await new Promise((resolve) => setTimeout(resolve, 100))
+  const vagueRegex = /(not sure|something broke|can't explain|idk|unsure)/i
+  const invalidRegex = /^v?\d(\.\d)?$|^ver\d+$/i
   return {
     modelName: name,
     predict: (input: string): Prediction => {
       const trimmed = input.trim()
       let score: number
       let type: string = orderedTypes[orderedTypes.length - 1] || 'ok'
+
       if (!trimmed && orderedTypes[0]) {
         score = 0.9
         type = orderedTypes[0]
-      } else if (trimmed.length < 10 && orderedTypes[1]) {
+      } else if (invalidRegex.test(trimmed) && orderedTypes.includes('invalid')) {
+        score = 0.85
+        type = 'invalid'
+      } else if (trimmed.length < 8 && orderedTypes[1]) {
         score = 0.8
         type = orderedTypes[1]
+      } else if ((vagueRegex.test(trimmed) || trimmed.split(/\s+/).length <= 3) && orderedTypes.includes('vague')) {
+        score = 0.7
+        type = 'vague'
       } else {
         score = 0.2
       }
+
       if (logIO) {
         console.log('[ML] input:', input, 'score:', score, 'type:', type)
       }

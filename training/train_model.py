@@ -49,8 +49,8 @@ def load_data():
 def train_model(texts, labels):
     X_train, X_test, y_train, y_test = train_test_split(texts, labels, test_size=0.2, random_state=42)
     pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000)),
-        ("clf", LogisticRegression(max_iter=1000))
+        ("tfidf", TfidfVectorizer(max_features=10000, ngram_range=(1, 2))),
+        ("clf", LogisticRegression(max_iter=2000))
     ])
     pipeline.fit(X_train, y_train)
     preds = pipeline.predict(X_test)
@@ -60,7 +60,8 @@ def train_model(texts, labels):
 
 def export_onnx(model):
     initial_type = [('input', StringTensorType([None, 1]))]
-    onnx_model = convert_sklearn(model, initial_types=initial_type)
+    options = {id(model): {'zipmap': False}}
+    onnx_model = convert_sklearn(model, initial_types=initial_type, options=options)
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     with MODEL_PATH.open('wb') as f:
         f.write(onnx_model.SerializeToString())
