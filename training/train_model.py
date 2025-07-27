@@ -5,6 +5,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
+from sklearn.compose import ColumnTransformer
+import pandas as pd
 import onnx
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
@@ -25,9 +27,10 @@ FIELDS = [
 
 
 def load_data():
+    """Load dataset and return records split into field/value pairs."""
     with DATA_PATH.open() as f:
         data = json.load(f)
-    texts = []
+    records = []
     labels = []
     for entry in data:
         errors = entry.get("errors")
@@ -35,22 +38,32 @@ def load_data():
             for field in FIELDS:
                 value = entry.get(field, "")
                 label = errors.get(field, "ok")
-                texts.append(f"{field}: {value}")
+                records.append({"field": field, "value": value})
                 labels.append(label)
         else:
             label = entry.get("label", "ok")
             for field in FIELDS:
                 value = entry.get(field, "")
-                texts.append(f"{field}: {value}")
+                records.append({"field": field, "value": value})
                 labels.append(label)
-    return texts, labels
+    return records, labels
 
 
-def train_model(texts, labels):
-    X_train, X_test, y_train, y_test = train_test_split(texts, labels, test_size=0.2, random_state=42)
+def train_model(records, labels):
+    """Train classifier using field and value as separate text inputs."""
+    df = pd.DataFrame(records)
+    X_train, X_test, y_train, y_test = train_test_split(df, labels, test_size=0.2, random_state=42)
+
+    transformer = ColumnTransformer(
+        [
+            ("field", TfidfVectorizer(), "field"),
+            ("value", TfidfVectorizer(max_features=10000, ngram_range=(1, 2)), "value"),
+        ]
+    )
+
     pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=10000, ngram_range=(1, 2))),
-        ("clf", LogisticRegression(max_iter=2000))
+        ("features", transformer),
+        ("clf", LogisticRegression(max_iter=2000)),
     ])
 
     pipeline.fit(X_train, y_train)
@@ -60,8 +73,12 @@ def train_model(texts, labels):
 
 
 def export_onnx(model):
-    initial_type = [('input', StringTensorType([None, 1]))]
-    options = {id(model): {'zipmap': False}}
+    """Export the trained scikit-learn model to ONNX format."""
+    initial_type = [
+        ("field", StringTensorType([None, 1])),
+        ("value", StringTensorType([None, 1])),
+    ]
+    options = {id(model): {"zipmap": False}}
     onnx_model = convert_sklearn(model, initial_types=initial_type, options=options)
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     with MODEL_PATH.open('wb') as f:
@@ -70,6 +87,6 @@ def export_onnx(model):
 
 
 if __name__ == "__main__":
-    texts, labels = load_data()
-    model = train_model(texts, labels)
+    records, labels = load_data()
+    model = train_model(records, labels)
     export_onnx(model)
