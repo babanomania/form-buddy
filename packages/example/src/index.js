@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 
 import './index.css';
 import App from './App';
+import { runModelTests } from './runModelTests';
 
 const theme = createTheme({
   palette: {
@@ -20,3 +21,8 @@ root.render(
     </ThemeProvider>
   </React.StrictMode>
 );
+
+// expose test helper on window for manual execution
+if (typeof window !== 'undefined') {
+  window.runModelTests = runModelTests;
+}
