@@ -6,3 +6,4 @@ Faker
 pandas
 pytest
 onnxruntime
+huggingface_hub

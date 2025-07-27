@@ -178,6 +178,37 @@ pip install -r requirements.txt
 python train_model.py
 ```
 
+## Downloading the LLM Model (WebLLM)
+
+FormBuddy uses a small, quantized open-source language model (like `Qwen3-1.7B-q4f32_1-MLC`) to generate helpful suggestions. All inference happens locally using [WebLLM](https://github.com/mlc-ai/web-llm), so the model needs to be downloaded before first use.
+
+We provide a script to download the model directly from Hugging Face into the correct folder.
+
+### Steps to Download
+
+1. From the project root, run the following:
+
+   ```bash
+   pip install huggingface_hub
+   ```
+
+2. Then execute the script:
+
+   ```bash
+   cd training
+   python download_llm_model.py
+   ```
+
+   This will fetch the model from [mlc-ai/Qwen1.5-1.8B-Chat-q4f32\_1-MLC](https://huggingface.co/mlc-ai/Qwen1.5-1.8B-Chat-q4f32_1-MLC) and place it inside:
+
+   ```
+   ../packages/example/public/models/Qwen3-1.7B-q4f32_1-MLC/
+   ```
+
+3. When running the example app, FormBuddy will load this model from the local browser using WebLLM's in-browser runtime — no network calls involved.
+
+> Note: If your environment is air-gapped, you can run the script on a machine with internet access and manually copy the folder to the target system.
+
 ## Testing
 
 Run the example project locally with:

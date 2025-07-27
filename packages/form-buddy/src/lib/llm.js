@@ -55,9 +55,15 @@ export async function loadLLM(id = envModelId) {
       if (!engine) {
         try {
           const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
-          engine = await CreateMLCEngine(id);
+          
+          // engine = await CreateMLCEngine(id);
+          const engine = await CreateMLCEngine(id, {
+            model_url: `/models/${id}/`, // WebLLM will fetch model JSON and binaries from here
+          });
+          logger("Model Url", { modelUrl: `/models/${id}/` });
+          logger('WebLLM engine info', { info: engine.info });
 
-          logger('WebLLM engine created', { id });
+          logger('WebLLM engine created', { id });  
           engineCache.set(id, engine);
 
         } catch (err) {
