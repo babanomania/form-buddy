@@ -30,13 +30,17 @@ export function useFormBuddy(
   const llmRef = useRef(null);
   const cache = useRef(new Map());
   const fieldMap = useRef(Object.fromEntries(fields.map((f) => [f.name, f.description])));
+
   const MEMORY_LIMIT = 100 * 1024 * 1024; // 100MB
   const lowMemory = (() => {
     if (process.env.REACT_APP_LOW_MEMORY !== 'true') return false;
+
     const perf = typeof performance !== 'undefined' ? performance : null;
     if (!perf || !perf.memory) return true;
+
     const free = perf.memory.jsHeapSizeLimit - perf.memory.usedJSHeapSize;
     return free < MEMORY_LIMIT;
+    
   })();
 
   useEffect(() => {

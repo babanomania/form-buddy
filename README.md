@@ -184,73 +184,10 @@ Run the example project locally with:
 
 ```bash
 npm install
-npm --workspace packages/example run dev
+npm --workspace packages/example run start
 ```
 
 Open `http://localhost:5173` to try it out.
-
-To verify the service worker and production build, run:
-
-```bash
-npm --workspace packages/example run build
-npm --workspace packages/example run preview
-```
-
-
-## Spec: `useFormBuddy` API
-
-### Hook Signature
-
-```js
-function useFormBuddy(
-  formDescription,
-  fields,
-  getPrompt,
-  options = {}
-) {
-  // returns { handleBlur, loading, checking }
-}
-```
-
-### Input Parameters
-
-- **formDescription** (`string`):
-  - A human-readable description of the form's purpose. Used in prompt generation for LLM explanations.
-
-- **fields** (`FieldDetail[]`):
-  - An array of objects describing each form field.
-  - `FieldDetail` structure:
-    ```js
-    {
-      name: 'fieldName',       // matches your form data keys
-      description: 'short description'
-    }
-    ```
-
-- **getPrompt** (`(form: string, field: string, error: string) => string`):
-  - A function that returns a system prompt for the LLM, given the form description, field description, and error type.
-
-- **options** (optional object):
-  - `validationModelName` (`string`): Filename of the ONNX model for predictive validation.
-  - `llmModelName` (`string`): Model ID for the LLM (e.g., TinyLlama, Qwen3-1.7B, etc).
-  - `errorTypes` (`string[]`): List of error types the model can return (e.g., `['missing', 'invalid', 'vague', 'ok']`).
-  - `threshold` (`number`): Confidence threshold for predictive validation (default: 0.5).
-  - `errorMessageGenerator` (`(error, field) => string`): Function used to create static messages when low memory mode is triggered. Low memory mode activates if `REACT_APP_LOW_MEMORY=true` and the browser reports less than 100MB of free JS heap.
-
--### Return Value
-
-The hook returns an object with the following properties:
-
-- **handleBlur** (`(field: string, value: any) => Promise<void>`):
-  - Call this in your field's `onBlur` handler to trigger predictive validation and LLM hint generation for that field.
-
-- **loading** (`boolean`):
-  - `true` while the ML/LLM models are loading or initializing. Use to show a global loading indicator.
-
-- **checking** (`Record<string, boolean>`):
-  - An object mapping each field name to a boolean. `true` if that field is currently being checked by the ML/LLM pipeline (e.g., after `handleBlur`).
-
----
 
 ## Project Structure
 
