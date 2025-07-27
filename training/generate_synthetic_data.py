@@ -13,7 +13,7 @@ DEVICES = [
     "macOS 14",
     "Ubuntu 22.04",
     "iPadOS 17",
-    "ChromeOS"
+    "ChromeOS",
 ]
 ACTIONS = [
     "tap the Save button",
@@ -54,14 +54,16 @@ def valid_version() -> str:
 
 
 def invalid_version() -> str:
-    return random.choice([
-        "v1",
-        "1.0",
-        "ver" + str(random.randint(6, 99)),
-        "version" + str(random.randint(100, 999)),
-        f"v{faker.word()}",
-        "",
-    ])
+    return random.choice(
+        [
+            "v1",
+            "1.0",
+            "ver" + str(random.randint(6, 99)),
+            "version" + str(random.randint(100, 999)),
+            f"v{faker.word()}",
+            "",
+        ]
+    )
 
 
 def sentence_with_issue() -> str:
@@ -72,21 +74,24 @@ def sentence_with_issue() -> str:
 
 
 def short_issue() -> str:
-    return random.choice([
-        "app crashed",
-        "it froze",
-        "something broke",
-        "not sure",
-        "can't explain",
-        "",
-    ])
+    return random.choice(
+        [
+            "app crashed",
+            "it froze",
+            "something broke",
+            "not sure",
+            "can't explain",
+            "",
+        ]
+    )
 
 
 def generate_entry(label: str) -> dict:
     errors = {}
 
-    if label == "invalid" and random.random() < 0.3:
-        full_name = f"{faker.word()} {faker.word()}"
+    if label == "invalid" and random.random() < 0.6:
+        # produce clearly malformed names to help the classifier
+        full_name = f"{faker.word()}{random.randint(100,999)}"
         errors["fullName"] = "invalid"
     else:
         full_name = faker.name()
@@ -160,10 +165,7 @@ def generate_entry(label: str) -> dict:
 
 def main() -> None:
     labels = (
-        ["complete"] * 1200
-        + ["vague"] * 900
-        + ["incomplete"] * 600
-        + ["invalid"] * 300
+        ["complete"] * 1200 + ["vague"] * 900 + ["incomplete"] * 600 + ["invalid"] * 300
     )
     random.shuffle(labels)
     reports = [generate_entry(label) for label in labels]
