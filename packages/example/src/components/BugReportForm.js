@@ -12,10 +12,10 @@ const FIELDS = [
   { name: 'fullName', description: 'full name' },
   { name: 'email', description: 'contact email address' },
   { name: 'feedbackType', description: 'Bug, Feature or UI Issue' },
-  { name: 'version', description: 'application version number' },
-  { name: 'steps', description: 'steps to reproduce the problem' },
-  { name: 'expected', description: 'expected behaviour of the application' },
-  { name: 'actual', description: 'actual behaviour observed' },
+  { name: 'appVersion', description: 'application version number' },
+  { name: 'stepsToReproduce', description: 'steps to reproduce the problem' },
+  { name: 'expectedBehavior', description: 'expected behaviour of the application' },
+  { name: 'actualBehavior', description: 'actual behaviour observed' },
 ]
 
 // Generate more detailed prompts based on the detected error type
@@ -118,10 +118,10 @@ function InnerForm() {
   const fullNameField = register('fullName')
   const emailField = register('email')
   const feedbackTypeField = register('feedbackType')
-  const versionField = register('version')
-  const stepsField = register('steps')
-  const expectedField = register('expected')
-  const actualField = register('actual')
+  const versionField = register('appVersion')
+  const stepsField = register('stepsToReproduce')
+  const expectedField = register('expectedBehavior')
+  const actualField = register('actualBehavior')
   const screenshotField = register('screenshot')
 
   const onSubmit = (data) => {
@@ -182,11 +182,11 @@ function InnerForm() {
           {...versionField}
           onBlur={async (e) => {
             versionField.onBlur(e)
-            const valid = await trigger('version')
-            if (valid) await handleBlur('version', e.target.value)
+            const valid = await trigger('appVersion')
+            if (valid) await handleBlur('appVersion', e.target.value)
           }}
-          error={!!errors.version}
-          helperText={checking.version ? 'Checking...' : errors.version?.message || ' '}
+          error={!!errors.appVersion}
+          helperText={checking.appVersion ? 'Checking...' : errors.appVersion?.message || ' '}
         />
 
         <TextField
@@ -196,11 +196,11 @@ function InnerForm() {
           {...stepsField}
           onBlur={async (e) => {
             stepsField.onBlur(e)
-            const valid = await trigger('steps')
-            if (valid) await handleBlur('steps', e.target.value)
+            const valid = await trigger('stepsToReproduce')
+            if (valid) await handleBlur('stepsToReproduce', e.target.value)
           }}
-          error={!!errors.steps}
-          helperText={checking.steps ? 'Checking...' : errors.steps?.message || ' '}
+          error={!!errors.stepsToReproduce}
+          helperText={checking.stepsToReproduce ? 'Checking...' : errors.stepsToReproduce?.message || ' '}
         />
 
         <TextField
@@ -210,11 +210,11 @@ function InnerForm() {
           {...expectedField}
           onBlur={async (e) => {
             expectedField.onBlur(e)
-            const valid = await trigger('expected')
-            if (valid) await handleBlur('expected', e.target.value)
+            const valid = await trigger('expectedBehavior')
+            if (valid) await handleBlur('expectedBehavior', e.target.value)
           }}
-          error={!!errors.expected}
-          helperText={checking.expected ? 'Checking...' : errors.expected?.message || ' '}
+          error={!!errors.expectedBehavior}
+          helperText={checking.expectedBehavior ? 'Checking...' : errors.expectedBehavior?.message || ' '}
         />
 
         <TextField
@@ -224,11 +224,11 @@ function InnerForm() {
           {...actualField}
           onBlur={async (e) => {
             actualField.onBlur(e)
-            const valid = await trigger('actual')
-            if (valid) await handleBlur('actual', e.target.value)
+            const valid = await trigger('actualBehavior')
+            if (valid) await handleBlur('actualBehavior', e.target.value)
           }}
-          error={!!errors.actual}
-          helperText={checking.actual ? 'Checking...' : errors.actual?.message || ' '}
+          error={!!errors.actualBehavior}
+          helperText={checking.actualBehavior ? 'Checking...' : errors.actualBehavior?.message || ' '}
         />
 
         <Button variant="outlined" component="label">

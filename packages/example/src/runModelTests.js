@@ -1,4 +1,4 @@
-import { loadModel } from 'form-buddy/src/lib/classifier.js';
+import { loadModel } from 'form-buddy';
 
 const TEST_CASES = [
   ['fullName', 'John Doe', 'ok'],

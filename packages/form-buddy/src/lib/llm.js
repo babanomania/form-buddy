@@ -56,12 +56,13 @@ export async function loadLLM(id = envModelId) {
         try {
           const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
           
-          // engine = await CreateMLCEngine(id);
-          const engine = await CreateMLCEngine(id, {
-            model_url: `/models/${id}/`, // WebLLM will fetch model JSON and binaries from here
+          //engine = await CreateMLCEngine(id);
+          engine = await CreateMLCEngine('Qwen3-1.7B-q4f32_1-MLC', {
+            model_id: 'Qwen3-1.7B-q4f32_1-MLC',
+            model_url: `/models/${id}/`
           });
-          logger("Model Url", { modelUrl: `/models/${id}/` });
-          logger('WebLLM engine info', { info: engine.info });
+          logger("WebLLM model Url", { modelUrl: `/models/${id}/` });
+          logger('WebLLM engine', { engine });
 
           logger('WebLLM engine created', { id });  
           engineCache.set(id, engine);
