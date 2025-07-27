@@ -16,14 +16,20 @@ export async function loadModel(
   const orderedTypes = [...errorTypes].sort()
   const response = await fetch(`/models/${name}`)
   const buffer = await response.arrayBuffer()
+  
+  // ensure the WASM backend can locate its binaries
+  if (!ort.env.wasm.wasmPaths) {
+    ort.env.wasm.wasmPaths = '/wasm/'
+  }
+
   const session = await ort.InferenceSession.create(buffer)
 
   return {
     modelName: name,
     async predict(field: string, value: string): Promise<Prediction> {
       const feeds: Record<string, ort.Tensor> = {
-        field: new ort.Tensor('string', [[field]]),
-        value: new ort.Tensor('string', [[value]]),
+        field: new ort.Tensor('string', [field], [1, 1]),
+        value: new ort.Tensor('string', [value], [1, 1]),
       }
       const results = await session.run(feeds)
       const label = (results.label.data as string[])[0]

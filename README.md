@@ -166,6 +166,12 @@ pip install -r requirements.txt
 python train_model.py
 ```
 
+5. Copy ONNX Runtime's WebAssembly assets so the demo can load them:
+
+```bash
+cp node_modules/onnxruntime-web/dist/ort-wasm* packages/example/public/wasm/
+```
+
 ## Testing
 
 Run the example project locally with:
