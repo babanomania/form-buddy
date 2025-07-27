@@ -28,17 +28,6 @@ FormBuddy enhances [React Hook Form](https://react-hook-form.com/) by adding:
 
 FormBuddy is proof that modern browsers aren’t just Chrome—they’re Chrome with an ML sidekick.
 
-### Recognized input patterns
-
-The demo classifier is trained on a diverse set of bug reports so it can detect:
-
-- Empty or extremely short answers
-- Vague statements such as "it just crashed" or "can't explain"
-- Invalid version numbers like `v1` or `ver42`
-- Bug descriptions missing key reproduction steps
-
-This predictive layer catches sloppy reports that static validation would miss.
-
 ## Using FormBuddy
 
 1. **Identify your form.** Determine the form description and list of fields. For a bug report form we use:
@@ -56,7 +45,7 @@ This predictive layer catches sloppy reports that static validation would miss.
     ]
    ```
 
-2. **Create labelled data.** A richer synthetic dataset is generated with `training/generate_synthetic_data.py` and looks like:
+2. **Create labelled data.** A small synthetic dataset is generated with `training/generate_synthetic_data.py` and looks like:
 
    ```json
    {
@@ -82,7 +71,7 @@ This predictive layer catches sloppy reports that static validation would miss.
 
    The full dataset is saved to `training/bug_reports_data.json` and is used to train the classifier.
 
-3. **Train the classifier.** Run `python training/train_model.py` to produce an ONNX model. The script reads the dataset, trains a linear SVM text classifier and writes `bug_report_classifier.onnx` to `packages/example/public/models`.
+3. **Train the classifier.** Run `python training/train_model.py` to produce an ONNX model. The script reads the dataset, trains a logistic regression pipeline and writes `bug_report_classifier.onnx` to `packages/example/public/models`.
 
 4. **Define system prompts.** Prompts are generated dynamically based on form description, field description and the ML error type. The example application defines a helper:
 
@@ -145,11 +134,11 @@ This predictive layer catches sloppy reports that static validation would miss.
 
 ## Training the ML model
 
-The repository includes a Python script that trains a text classifier
-on a large synthetic bug report dataset and exports it to ONNX format.
-Each row of the dataset contains per-field error labels so the model
-can predict issues for individual inputs. The resulting file is placed
-in `packages/example/public/models` and can be loaded by the predictive
+The repository includes a small Python script that trains a text
+classifier on the synthetic bug report dataset and exports it to ONNX
+format. Each row of the dataset now contains per-field error labels so
+the model can predict issues for individual inputs. The resulting file
+is placed in `packages/example/public/models` and can be loaded by the predictive
 validation hook.
 
 1. Install the change to training directory:

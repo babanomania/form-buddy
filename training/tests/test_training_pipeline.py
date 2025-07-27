@@ -1,17 +1,27 @@
 import sys
+import importlib.util
 from pathlib import Path
 
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
-TRAIN_DIR = ROOT_DIR / "training"
+TRAIN_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = TRAIN_DIR.parent
 DATA_PATH = ROOT_DIR / "bug_reports_data.json"
 
 
 def load_training_modules():
-    sys.path.insert(0, str(TRAIN_DIR))
-    import generate_synthetic_data  # type: ignore
-    import train_model  # type: ignore
+    def import_from_path(module_name, file_path):
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)  # type: ignore
+        return module
 
+    generate_synthetic_data = import_from_path(
+        "generate_synthetic_data", TRAIN_DIR / "generate_synthetic_data.py"
+    )
+    train_model = import_from_path(
+        "train_model", TRAIN_DIR / "train_model.py"
+    )
+    
     return generate_synthetic_data, train_model
 
 
