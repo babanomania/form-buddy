@@ -5,8 +5,16 @@ from faker import Faker
 
 faker = Faker()
 
-FEEDBACK_TYPES = ["Bug", "Feature", "UI Issue"]
-DEVICES = ["Android 13", "iOS 17", "Windows 11", "macOS 14", "Ubuntu 22.04"]
+FEEDBACK_TYPES = ["Bug", "Feature", "UI Issue", "Performance", "Other"]
+DEVICES = [
+    "Android 13",
+    "iOS 17",
+    "Windows 11",
+    "macOS 14",
+    "Ubuntu 22.04",
+    "iPadOS 17",
+    "ChromeOS"
+]
 ACTIONS = [
     "tap the Save button",
     "open the settings page",
@@ -18,18 +26,22 @@ ACTIONS = [
     "change the theme",
     "select a menu item",
     "resize the window",
+    "scroll down",
+    "drag an item",
 ]
 ISSUES = [
     "crashes with error code 500",
     "freezes after login",
     "shows a blank screen",
     "does not respond",
-    "crashed imediately",
+    "crashed immediately",
     "bttn not responsive",
     "screen go blank",
     "resets the form",
     "closes unexpectedly",
     "shows garbled text",
+    "runs very slowly",
+    "fails with an unknown error",
 ]
 
 
@@ -45,7 +57,8 @@ def invalid_version() -> str:
     return random.choice([
         "v1",
         "1.0",
-        "version" + str(random.randint(6, 99)),
+        "ver" + str(random.randint(6, 99)),
+        "version" + str(random.randint(100, 999)),
         f"v{faker.word()}",
         "",
     ])
@@ -64,6 +77,7 @@ def short_issue() -> str:
         "it froze",
         "something broke",
         "not sure",
+        "can't explain",
         "",
     ])
 
@@ -146,10 +160,10 @@ def generate_entry(label: str) -> dict:
 
 def main() -> None:
     labels = (
-        ["complete"] * 800
-        + ["vague"] * 600
-        + ["incomplete"] * 400
-        + ["invalid"] * 200
+        ["complete"] * 1200
+        + ["vague"] * 900
+        + ["incomplete"] * 600
+        + ["invalid"] * 300
     )
     random.shuffle(labels)
     reports = [generate_entry(label) for label in labels]
