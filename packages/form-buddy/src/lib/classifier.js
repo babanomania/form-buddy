@@ -15,8 +15,8 @@ function makePredict(session, orderedTypes) {
 
     const results = await session.run(feeds);
     const label = results.label.data[0];
-    let score = 0;
 
+    let score = 0;
     if (results.probabilities && orderedTypes.includes(label)) {
       const probs = results.probabilities.data;
       const idx = orderedTypes.indexOf(label);
