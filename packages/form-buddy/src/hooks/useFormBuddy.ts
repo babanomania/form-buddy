@@ -85,7 +85,7 @@ export function useFormBuddy<T extends FieldValues>(
     }
 
     if (logIO) console.log(`[ML] Predicting for field "${name}"...`);
-    const prediction: Prediction = modelRef.current.predict(
+    const prediction: Prediction = await modelRef.current.predict(
       name as string,
       value,
     );
