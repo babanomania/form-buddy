@@ -4,3 +4,4 @@ skl2onnx
 packaging
 Faker
 pandas
+pytest
